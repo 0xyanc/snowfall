@@ -23,13 +23,14 @@ library Stake {
      * @dev Stake weighted share is proportional to the stake value and time locked.
      *      Scaled to 1e6 to avoir loss in precision
      */
-    uint256 internal constant WEIGHT_MULTIPLIER = 5e6;
+    uint256 internal constant WEIGHT_MULTIPLIER = 5 * 1e6;
 
     /// @dev Minimum weight value of the stake that is added to the weight multiplier calculation
     uint256 internal constant BASE_WEIGHT = 1e6;
 
     /// @dev Minimum period that someone can lock a stake for - 1 month
-    uint256 internal constant MIN_STAKE_PERIOD = 30 days;
+    // uint256 internal constant MIN_STAKE_PERIOD = 30 days;
+    uint256 internal constant MIN_STAKE_PERIOD = 1 seconds;
 
     /// @dev Fixed lock period for claimed yield - 1 year
     uint256 internal constant YIELD_STAKE_PERIOD = 365 days;
@@ -37,8 +38,8 @@ library Stake {
     /// @dev Maximum period that someone can lock a stake for - 5 years
     uint256 internal constant MAX_STAKE_PERIOD = 1825 days;
 
-    /// @dev Rewards per weight are stored multiplied by 1e10.
-    uint256 internal constant REWARD_PER_SHARE_MULTIPLIER = 1e10;
+    /// @dev Rewards per weight are stored multiplied by 1e20.
+    uint256 internal constant REWARD_PER_SHARE_MULTIPLIER = 1e20;
 
     /// @dev Claimed yield is always locked for 1 year there weight is 2
     uint256 internal constant YIELD_STAKE_WEIGHT_MULTIPLIER = 2 * 1e6;

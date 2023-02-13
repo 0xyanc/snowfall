@@ -11,6 +11,7 @@ import { hardhat } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react';
 import Layout from '@/components/Layout/Layout';
+import { ContractProvider } from '@/context/ContractContext';
 const { chains, provider } = configureChains(
   [hardhat],
   [
@@ -35,9 +36,11 @@ export default function App({ Component, pageProps }) {
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains}>
         <ChakraProvider>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <ContractProvider>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ContractProvider>
         </ChakraProvider>
       </RainbowKitProvider>\
     </WagmiConfig>

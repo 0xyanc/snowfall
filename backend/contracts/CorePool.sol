@@ -49,10 +49,9 @@ abstract contract CorePool is Ownable {
     uint64 public lastYieldDistribution;
     /// @dev Used to calculate yield rewards (equivalent to rewardIndex)
     uint256 public yieldRewardsPerShare;
-    /**
-     * @dev Total weighted shares in the pool, the sum of the weighted shares of the stakers.
-     *      Used to calculate rewards, keeps track of the tokens weight locked in staking.
-     */
+
+    /// @dev Total weighted shares in the pool, the sum of the weighted shares of the stakers.
+    ///      Used to calculate rewards, keeps track of the tokens weight locked in staking.
     uint256 public totalPoolWeightedShares;
 
     /// @dev number of SNOW rewarded to stakers per second, increases by 1% every week.
@@ -75,13 +74,13 @@ abstract contract CorePool is Ownable {
      * @param account token holder address, the tokens will be returned to that address
      * @param stakeId id of the new stake created
      * @param value value of tokens staked
-     * @param lockUntil timestamp indicating when tokens should unlock (max 5 years)
+     * @param lockedUntil timestamp indicating when tokens should unlock (max 5 years)
      */
     event Staked(
         address indexed account,
         uint256 stakeId,
         uint256 value,
-        uint64 lockUntil
+        uint64 lockedUntil
     );
 
     /**
@@ -89,15 +88,9 @@ abstract contract CorePool is Ownable {
      *
      * @param account address receiving the tokens
      * @param stakeId id value of the stake
-     * @param value number of tokens unstaked
      * @param isYield whether stake struct unstaked was coming from yield or not
      */
-    event Unstake(
-        address indexed account,
-        uint256 stakeId,
-        uint256 value,
-        bool isYield
-    );
+    event Unstake(address indexed account, uint256 stakeId, bool isYield);
 
     /**
      * @dev Fired in claimYieldRewards()
@@ -226,14 +219,8 @@ abstract contract CorePool is Ownable {
      *      Otherwise transfer SNOW or LP from the contract balance.
      *
      * @param _stakeId stake ID to unstake from, zero-indexed
-     * @param _value value of tokens to unstake
      */
-    function unstake(uint256 _stakeId, uint256 _value) external {
-        // verify a value is set
-        if (_value == 0) {
-            revert CorePool__ValueCannotBeZero();
-        }
-
+    function unstake(uint256 _stakeId) external {
         // get a pointer to user data struct
         User storage user = users[msg.sender];
         // get a pointer to the corresponding stake
@@ -243,15 +230,11 @@ abstract contract CorePool is Ownable {
             revert CorePool__NotUnlockedYet();
         }
 
-        // save values in the case the stake is deleted later (if unstaking the full amount)
+        // save values before the stake is deleted
         (uint120 stakeValue, bool isYield) = (
             userStake.value,
             userStake.isYield
         );
-        // verify available balance
-        if (_value > stakeValue) {
-            revert CorePool__ValueMoreThanStakeValue();
-        }
         // process current pending rewards if any
         _updateReward(msg.sender);
         // store weighted shares of this stake
@@ -259,15 +242,8 @@ abstract contract CorePool is Ownable {
         // value used to save new weighted shares of this stake
         uint256 newWeightedShares;
 
-        // update the stake, or delete it if its depleted
-        if (stakeValue - _value == 0) {
-            // deletes stake struct, no need to save new weight because it stays 0
-            delete user.stakes[_stakeId];
-        } else {
-            userStake.value -= uint120(_value);
-            // saves new weight to memory
-            newWeightedShares = Stake.weightedShares(userStake);
-        }
+        // deletes stake struct, no need to save new weight because it stays 0
+        delete user.stakes[_stakeId];
         // update user total weighted shares with unstaked amount
         user.totalWeightedShares = uint128(
             user.totalWeightedShares - stakeWeightedShares + newWeightedShares
@@ -278,19 +254,19 @@ abstract contract CorePool is Ownable {
             stakeWeightedShares +
             newWeightedShares;
         // update global pool token count
-        totalTokensInPool -= _value;
+        totalTokensInPool -= stakeValue;
 
         // if the stake as yield reward
         if (isYield) {
             // Transfer the unlocked yield to the sender
-            SnowfallERC20(snowToken).transfer(msg.sender, _value);
+            SnowfallERC20(snowToken).transfer(msg.sender, stakeValue);
         } else {
             // otherwise return the deposited tokens back to the staker
-            IERC20(poolToken).transfer(msg.sender, _value);
+            IERC20(poolToken).transfer(msg.sender, stakeValue);
         }
 
         // emits Unstake event
-        emit Unstake(msg.sender, _stakeId, _value, isYield);
+        emit Unstake(msg.sender, _stakeId, isYield);
     }
 
     /**
@@ -317,34 +293,37 @@ abstract contract CorePool is Ownable {
             revert CorePool__InvalidStakerAddress();
         }
         // `newYieldRewardsPerWeight` will be the stored or recalculated value for `yieldRewardsPerWeight`
-        // uint256 newYieldRewardsPerShare;
+        uint256 newYieldRewardsPerShare;
         // // gas savings
         // uint256 _lastYieldDistribution = lastYieldDistribution;
 
         // based on the rewards per weight value, calculate pending rewards;
         User storage user = users[_staker];
 
-        // // if smart contract state was not updated recently, `yieldRewardsPerWeight` value
-        // // is outdated and we need to recalculate it in order to calculate pending rewards correctly
-        // if (now > _lastYieldDistribution && totalPoolWeightedShares != 0) {
-        //     uint256 multiplier = now > endTime
-        //         ? endTime - _lastYieldDistribution
-        //         : now - _lastYieldDistribution;
-        //     uint256 rewards = multiplier * rewardPerSecond;
+        // if smart contract state was not updated recently, `yieldRewardsPerWeight` value
+        // is outdated and we need to recalculate it in order to calculate pending rewards correctly
+        if (
+            block.timestamp > lastYieldDistribution &&
+            totalPoolWeightedShares != 0
+        ) {
+            uint256 multiplier = block.timestamp > endTime
+                ? endTime - lastYieldDistribution
+                : block.timestamp - lastYieldDistribution;
+            uint256 rewards = multiplier * rewardPerSecond;
 
-        //     // recalculated value for `yieldRewardsPerWeight`
-        //     newYieldRewardsPerShare =
-        //         Stake.getRewardPerShare(rewards, totalPoolWeightedShares) +
-        //         yieldRewardsPerShare;
-        // } else {
-        //     // if smart contract state is up to date, we don't recalculate
-        //     newYieldRewardsPerShare = yieldRewardsPerShare;
-        // }
+            // recalculated value for `yieldRewardsPerWeight`
+            newYieldRewardsPerShare =
+                Stake.getRewardPerShare(rewards, totalPoolWeightedShares) +
+                yieldRewardsPerShare;
+        } else {
+            // if smart contract state is up to date, we don't recalculate
+            newYieldRewardsPerShare = yieldRewardsPerShare;
+        }
 
         return
             Stake.earned(
                 user.totalWeightedShares,
-                yieldRewardsPerShare,
+                newYieldRewardsPerShare,
                 user.yieldRewardsPerSharePaid
             ) + user.pendingYield;
     }
@@ -410,6 +389,12 @@ abstract contract CorePool is Ownable {
         // update rewards per second value if required
         if (shouldUpdateRatio()) {
             updateRewardPerSecond();
+        }
+
+        // if no one has staked yet, update lastYieldDistribution and return
+        if (totalPoolWeightedShares == 0) {
+            lastYieldDistribution = uint64(block.timestamp);
+            return;
         }
 
         // to calculate the reward we need to know how many seconds passed, and reward per second

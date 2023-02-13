@@ -1,4 +1,4 @@
-const { network } = require("hardhat")
+const { network, ethers } = require("hardhat")
 const { developmentChains } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
 
@@ -8,7 +8,8 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     log("--------------------------------------")
     log("*** Deploying SnowfallERC20 ***")
-    let args = [70000000]
+    const initialSupply = ethers.utils.parseUnits("70000000", "ether")
+    let args = [initialSupply]
     const snowERC20 = await deploy("SnowfallERC20", {
         from: deployer,
         args: args,

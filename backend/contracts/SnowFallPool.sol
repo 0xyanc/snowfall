@@ -39,13 +39,15 @@ contract SnowfallPool is CorePool {
         // 2e6 is the bonus weight when staking for 1 year
         uint256 stakeWeightedShares = pendingYieldToClaim *
             Stake.YIELD_STAKE_WEIGHT_MULTIPLIER;
-
+        // the yield will be locked for a year
+        uint64 lockUntil = uint64(block.timestamp + Stake.YIELD_STAKE_PERIOD);
         // if the pool is ILV Pool - create new ILV stake
         // and save it - push it into stakes array
+
         Stake.Data memory newStake = Stake.Data({
             value: uint120(pendingYieldToClaim),
             lockedFrom: uint64(block.timestamp),
-            lockedUntil: uint64(block.timestamp + Stake.YIELD_STAKE_PERIOD), // staking yield for 1 year
+            lockedUntil: lockUntil,
             isYield: true
         });
         // add memory stake to storage
@@ -61,8 +63,15 @@ contract SnowfallPool is CorePool {
         // mint SNOW token to the Single Pool
         SnowfallERC20(snowToken).mint(address(this), pendingYieldToClaim);
 
-        // emits an event
+        // emits ClaimYieldRewards event
         emit ClaimYieldRewards(msg.sender, pendingYieldToClaim);
+        // emits Stake event
+        emit Staked(
+            msg.sender,
+            (user.stakes.length - 1),
+            pendingYieldToClaim,
+            lockUntil
+        );
     }
 
     /**

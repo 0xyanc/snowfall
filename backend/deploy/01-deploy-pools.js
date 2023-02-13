@@ -37,6 +37,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     // log(snowERC20Contract)
     snowERC20Contract.grantRole("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6", singlePool.address)
 
+
+    log("*** Initialise the pools ***")
+    const singlePoolContract = await ethers.getContractAt("SnowfallPool", singlePool.address)
+    const lpPoolContract = await ethers.getContractAt("SnowfallEthPool", lpPool.address)
+    singlePoolContract.initialize(singlePool.address, lpPool.address)
+    lpPoolContract.initialize(singlePool.address, lpPool.address)
+
     //Verify the smart contract 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN) {
         log("Verifying...")
