@@ -27,6 +27,10 @@ const Stake = ({ stake }) => {
     <Tr>
       <Td>{stake.pool === "Single" ? "Snowfall" : "Snowfall/ETH"}</Td>
       <Td>{stake.value}</Td>
+      <Td>{stake.weight}</Td>
+      <Td>
+        {stake.stakeTime.toLocaleDateString()} {stake.stakeTime.toLocaleTimeString()}
+      </Td>
       <Td>
         {stake.lockedUntil.toLocaleDateString()} {stake.lockedUntil.toLocaleTimeString()}
       </Td>

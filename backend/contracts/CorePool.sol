@@ -80,7 +80,9 @@ abstract contract CorePool is Ownable {
         address indexed account,
         uint256 stakeId,
         uint256 value,
-        uint64 lockedUntil
+        uint256 stakeTime,
+        uint64 lockedUntil,
+        uint256 stakeWeight
     );
 
     /**
@@ -179,13 +181,14 @@ abstract contract CorePool is Ownable {
 
         // calculates until when a stake is going to be locked
         uint64 lockUntil = uint64(block.timestamp) + _lockDuration;
-        // stake weight formula rewards for locking
-        uint256 stakeWeight = (((lockUntil - uint64(block.timestamp)) *
+        uint256 weight = (((lockUntil - uint64(block.timestamp)) *
             Stake.WEIGHT_MULTIPLIER) /
             Stake.MAX_STAKE_PERIOD +
-            Stake.BASE_WEIGHT) * _value;
+            Stake.BASE_WEIGHT);
+        // stake weight formula rewards for locking
+        uint256 stakeWeightedShares = weight * _value;
         // makes sure stakeWeight is valid
-        assert(stakeWeight > 0);
+        assert(stakeWeightedShares > 0);
         // create and save the stake (append it to stakes array)
         Stake.Data memory userStake = Stake.Data({
             value: uint120(_value),
@@ -196,9 +199,9 @@ abstract contract CorePool is Ownable {
         // pushes new stake to `stakes` array
         user.stakes.push(userStake);
         // update user weight
-        user.totalWeightedShares += uint128(stakeWeight);
+        user.totalWeightedShares += uint128(stakeWeightedShares);
         // update global weight value and global pool token count
-        totalPoolWeightedShares += stakeWeight;
+        totalPoolWeightedShares += stakeWeightedShares;
         totalTokensInPool += _value;
 
         // transfer `_value`
@@ -209,7 +212,14 @@ abstract contract CorePool is Ownable {
         );
 
         // emit Staked event
-        emit Staked(msg.sender, (user.stakes.length - 1), _value, lockUntil);
+        emit Staked(
+            msg.sender,
+            (user.stakes.length - 1),
+            _value,
+            block.timestamp,
+            lockUntil,
+            weight
+        );
     }
 
     /**

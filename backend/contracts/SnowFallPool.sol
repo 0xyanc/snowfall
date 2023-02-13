@@ -70,7 +70,9 @@ contract SnowfallPool is CorePool {
             msg.sender,
             (user.stakes.length - 1),
             pendingYieldToClaim,
-            lockUntil
+            block.timestamp,
+            lockUntil,
+            Stake.YIELD_STAKE_WEIGHT_MULTIPLIER
         );
     }
 
@@ -120,6 +122,13 @@ contract SnowfallPool is CorePool {
         SnowfallERC20(snowToken).mint(address(this), _value);
 
         // emits Stake event
-        emit Staked(_staker, (user.stakes.length - 1), _value, lockUntil);
+        emit Staked(
+            _staker,
+            (user.stakes.length - 1),
+            _value,
+            block.timestamp,
+            lockUntil,
+            Stake.YIELD_STAKE_WEIGHT_MULTIPLIER
+        );
     }
 }

@@ -1,8 +1,8 @@
 import { createContext, useContext } from "react";
 import { useContract, useProvider, useSigner } from "wagmi";
-import SnowfallERC20Contract from "../SnowfallERC20.json";
-import SnowfallPoolContract from "../SnowfallPool.json";
-import SnowfallEthPoolContract from "../SnowfallEthPool.json";
+import SnowfallERC20Contract from "../contracts/SnowfallERC20.json";
+import SnowfallPoolContract from "../contracts/SnowfallPool.json";
+import SnowfallEthPoolContract from "../contracts/SnowfallEthPool.json";
 
 const ContractContext = createContext();
 

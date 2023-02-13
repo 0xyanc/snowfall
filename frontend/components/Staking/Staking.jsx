@@ -1,4 +1,5 @@
 import { useContractProvider } from "@/context/ContractContext";
+import { WEIGHT_MULTIPLIER } from "@/util/Constants";
 import {
   Button,
   Flex,
@@ -87,8 +88,10 @@ const Staking = () => {
         account: event.args.account,
         id: event.args.stakeId.toString() + "-Single",
         value: ethers.utils.formatEther(event.args.value.toString()),
+        stakeTime: new Date(event.args.stakeTime.toString() * 1000),
         lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
         pool: "Single",
+        weight: event.args.stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
       });
     });
     // remove the single pool unstakes from the list
@@ -102,8 +105,10 @@ const Staking = () => {
         account: event.args.account,
         id: event.args.stakeId.toString() + "-LP",
         value: ethers.utils.formatEther(event.args.value.toString()),
+        stakeTime: new Date(event.args.stakeTime.toString() * 1000),
         lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
         pool: "LP",
+        weight: event.args.stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
       });
     });
     // remove the single pool unstakes from the list
@@ -203,6 +208,8 @@ const Staking = () => {
                   <Tr>
                     <Th>Pool</Th>
                     <Th isNumeric>Amount</Th>
+                    <Th isNumeric>Weight</Th>
+                    <Th>Lock date</Th>
                     <Th>Unlock date</Th>
                     <Th>Action</Th>
                   </Tr>
