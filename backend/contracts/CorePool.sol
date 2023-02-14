@@ -90,9 +90,8 @@ abstract contract CorePool is Ownable {
      *
      * @param account address receiving the tokens
      * @param stakeId id value of the stake
-     * @param isYield whether stake struct unstaked was coming from yield or not
      */
-    event Unstake(address indexed account, uint256 stakeId, bool isYield);
+    event Unstake(address indexed account, uint256 stakeId);
 
     /**
      * @dev Fired in claimYieldRewards()
@@ -276,7 +275,7 @@ abstract contract CorePool is Ownable {
         }
 
         // emits Unstake event
-        emit Unstake(msg.sender, _stakeId, isYield);
+        emit Unstake(msg.sender, _stakeId);
     }
 
     /**

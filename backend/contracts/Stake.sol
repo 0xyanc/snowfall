@@ -30,7 +30,7 @@ library Stake {
 
     /// @dev Minimum period that someone can lock a stake for - 1 month
     // uint256 internal constant MIN_STAKE_PERIOD = 30 days;
-    uint256 internal constant MIN_STAKE_PERIOD = 1 seconds;
+    uint256 internal constant MIN_STAKE_PERIOD = 0 days;
 
     /// @dev Fixed lock period for claimed yield - 1 year
     uint256 internal constant YIELD_STAKE_PERIOD = 365 days;
