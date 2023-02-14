@@ -5,19 +5,6 @@ const Header = () => {
   return (
     <Flex h="5vh" p="2rem" justifyContent="space-between" alignItems="center">
       <Text as="b">Snowfall Staking App</Text>
-      <Breadcrumb>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
-        </BreadcrumbItem>
-
-        {/* <BreadcrumbItem>
-          <BreadcrumbLink href="#">Docs</BreadcrumbLink>
-        </BreadcrumbItem> */}
-
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/vesting">Vesting</BreadcrumbLink>
-        </BreadcrumbItem>
-      </Breadcrumb>
       <ConnectButton />
     </Flex>
   );

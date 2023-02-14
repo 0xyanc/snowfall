@@ -1,11 +1,9 @@
-import { useAccountProvider } from "@/context/AccountContext";
 import { useStakesProvider } from "@/context/StakesContext";
 import { Tr, Text, Flex, TableContainer, Table, Thead, Th, Tbody } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import Stake from "../Stake/Stake";
 
 const Vesting = () => {
-  const { address, isConnected } = useAccountProvider();
   const { stakes } = useStakesProvider();
   const [date, setDate] = useState(new Date());
   useEffect(() => {

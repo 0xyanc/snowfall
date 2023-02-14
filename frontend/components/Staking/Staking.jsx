@@ -1,7 +1,5 @@
-import { useAccountProvider } from "@/context/AccountContext";
 import { useContractProvider } from "@/context/ContractContext";
 import { useStakesProvider } from "@/context/StakesContext";
-import { WEIGHT_MULTIPLIER } from "@/util/Constants";
 import {
   Button,
   Flex,
@@ -17,22 +15,14 @@ import {
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import Vesting from "../Vesting/Vesting";
 
 const Staking = () => {
-  const { address, isConnected } = useAccountProvider();
-  const { stakes } = useStakesProvider();
-  const {
-    readSnowERC20Contract,
-    writeSnowERC20Contract,
-    readSinglePoolContract,
-    writeSinglePoolContract,
-    readLpPoolContract,
-    writeLpPoolContract,
-    provider,
-  } = useContractProvider();
+  const { address, isConnected } = useAccount();
+  const { readSnowERC20Contract, writeSnowERC20Contract, readSinglePoolContract, writeSinglePoolContract } =
+    useContractProvider();
 
-  // const [stakes, setStakes] = useState([]);
   const [amountToStake, setAmountToStake] = useState(0);
   const [pendingRewards, setPendingRewards] = useState(0);
   const [snowAllowance, setSnowAllowance] = useState(0);
@@ -40,89 +30,11 @@ const Staking = () => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
-    // loadStakingEvents();
-  }, []);
-
-  useEffect(() => {
     if (isConnected) {
       getPendingRewards();
       getSnowAllowance();
     }
   }, [address, isConnected]);
-
-  // const loadStakingEvents = async () => {
-  //   const contractDeployBlock = parseInt(process.env.NEXT_PUBLIC_SC_DEPLOY_BLOCK);
-  //   const currentBlockNumber = await provider.getBlockNumber();
-  //   // arrays containing the events
-  //   let singlePoolStakeEvents = [];
-  //   let lpPoolStakeEvents = [];
-  //   let singlePoolUnstakeEvents = [];
-  //   let lpPoolUnstakeEvents = [];
-  //   // the filters needed to retrieve the stake and unstake events
-  //   const singlePoolStakeFilter = readSinglePoolContract.filters.Staked(address);
-  //   const lpPoolStakeFilter = readSinglePoolContract.filters.Staked(address);
-  //   const singlePoolUnstakeFilter = readSinglePoolContract.filters.Unstake(address);
-  //   const lpPoolUnstakeFilter = readSinglePoolContract.filters.Unstake(address);
-  //   // retrieve all events by batch of 3000 blocks since SC deployment
-  //   for (let startBlock = contractDeployBlock; startBlock < currentBlockNumber; startBlock += 3000) {
-  //     const endBlock = Math.min(currentBlockNumber, startBlock + 2999);
-
-  //     const allSinglePoolStakeEvents = await readSinglePoolContract.queryFilter(
-  //       singlePoolStakeFilter,
-  //       startBlock,
-  //       endBlock
-  //     );
-  //     const allLpPoolStakeEvents = await readLpPoolContract.queryFilter(lpPoolStakeFilter, startBlock, endBlock);
-  //     const allSinglePoolUnstakeEvents = await readSinglePoolContract.queryFilter(
-  //       singlePoolUnstakeFilter,
-  //       startBlock,
-  //       endBlock
-  //     );
-  //     const allLpPoolUnstakeEvents = await readLpPoolContract.queryFilter(lpPoolUnstakeFilter, startBlock, endBlock);
-  //     singlePoolStakeEvents = [...singlePoolStakeEvents, ...allSinglePoolStakeEvents];
-  //     lpPoolStakeEvents = [...lpPoolStakeEvents, ...allLpPoolStakeEvents];
-  //     singlePoolUnstakeEvents = [...singlePoolUnstakeEvents, ...allSinglePoolUnstakeEvents];
-  //     lpPoolUnstakeEvents = [...lpPoolUnstakeEvents, ...allLpPoolUnstakeEvents];
-  //   }
-  //   let stakeList = [];
-  //   // add all the single pool stakes to the list
-  //   singlePoolStakeEvents.map((event) => {
-  //     stakeList.push({
-  //       account: event.args.account,
-  //       id: event.args.stakeId.toString() + "-Single",
-  //       value: ethers.utils.formatEther(event.args.value.toString()),
-  //       stakeTime: new Date(event.args.stakeTime.toString() * 1000),
-  //       lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
-  //       pool: "Single",
-  //       weight: event.args.stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
-  //     });
-  //   });
-  //   // remove the single pool unstakes from the list
-  //   singlePoolUnstakeEvents.map((event) => {
-  //     const index = stakeList.findIndex((element) => element.id === event.args.stakeId.toString() + "-Single");
-  //     stakeList.splice(index, 1);
-  //   });
-  //   // add all the lp pool stakes to the list
-  //   lpPoolStakeEvents.map((event) => {
-  //     stakeList.push({
-  //       account: event.args.account,
-  //       id: event.args.stakeId.toString() + "-LP",
-  //       value: ethers.utils.formatEther(event.args.value.toString()),
-  //       stakeTime: new Date(event.args.stakeTime.toString() * 1000),
-  //       lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
-  //       pool: "LP",
-  //       weight: event.args.stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
-  //     });
-  //   });
-  //   // remove the single pool unstakes from the list
-  //   lpPoolUnstakeEvents.map((event) => {
-  //     const index = stakeList.findIndex((element) => element.id === event.args.stakeId.toString() + "-LP");
-  //     stakeList.splice(index, 1);
-  //   });
-  //   // sort the list by unlock date
-  //   stakeList.sort((a, b) => a.lockedUntil - b.lockedUntil);
-  //   setStakes(stakeList);
-  // };
 
   const getSnowAllowance = async () => {
     const allowance = await readSnowERC20Contract.allowance(address, process.env.NEXT_PUBLIC_SC_SINGLE_POOL);
@@ -247,28 +159,6 @@ const Staking = () => {
               )}
             </Flex>
             <Vesting />
-
-            {/* {proposalsRef.current.length !== 0 ? (
-              proposalsRef.current.map((proposal) => {
-                return (
-                  <Proposal
-                    proposal={proposal}
-                    key={proposal.id}
-                    hasVoted={voter.hasVoted}
-                    isRegistered={voter.isRegistered}
-                  />
-                );
-              })
-            ) */}
-            {/* <Heading mt="2rem">Withdraw</Heading>
-            <Flex mt="1rem">
-              <Input placeholder="Amount in ETH" onChange={(e) => setAmountToWithdraw(e.target.value)}></Input>
-              <Button colorScheme="purple" onClick={() => withdrawEther()}>
-                Withdraw
-              </Button>
-            </Flex> */}
-            {/* <Heading mt="2rem">Last Events</Heading>
-            <Events events={events} mt="1rem" /> */}
           </>
         ) : (
           <Text mt="1rem">Please connect your wallet to start</Text>
