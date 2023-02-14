@@ -1,43 +1,39 @@
-import { useStakesProvider } from "@/context/StakesContext";
-import { Tr, Text, Flex, TableContainer, Table, Thead, Th, Tbody } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import Stake from "../Stake/Stake";
+import { useContractProvider } from "@/context/ContractContext";
+import { Button, Tr, Td, Text } from "@chakra-ui/react";
+import { useEffect } from "react";
 
-const Vesting = () => {
-  const { stakes } = useStakesProvider();
-  const [date, setDate] = useState(new Date());
-  useEffect(() => {
-    var timer = setInterval(() => setDate(new Date()), 15000);
-    return () => clearInterval(timer);
-  });
+const Vesting = ({ stake, date }) => {
+  const { writeSinglePoolContract, writeLpPoolContract } = useContractProvider();
+
+  const unstake = async (id) => {
+    try {
+      const tx = await writeSinglePoolContract.unstake(id);
+      await tx.wait();
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
-    <>
-      <Text as="b">Vesting stakes</Text>
-      <Flex width="100%" direction={["column", "column", "row", "row"]} alignItems="center" flexWrap="wrap"></Flex>
-      <TableContainer>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th>Pool</Th>
-              <Th isNumeric>Amount</Th>
-              <Th isNumeric>Weight</Th>
-              <Th>Lock date</Th>
-              <Th>Unlock date</Th>
-              <Th>Action</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {stakes.length !== 0 ? (
-              stakes.map((stake) => {
-                return <Stake stake={stake} date={date} key={stake.id} />;
-              })
-            ) : (
-              <></>
-            )}
-          </Tbody>
-        </Table>
-      </TableContainer>
-    </>
+    <Tr>
+      <Td>{stake.pool === "Single" ? "Snowfall" : "Snowfall/ETH"}</Td>
+      <Td>{stake.value}</Td>
+      <Td>{stake.weight}</Td>
+      <Td>
+        {stake.stakeTime.toLocaleDateString()} {stake.stakeTime.toLocaleTimeString()}
+      </Td>
+      <Td>
+        {stake.lockedUntil.toLocaleDateString()} {stake.lockedUntil.toLocaleTimeString()}
+      </Td>
+      <Td>
+        {date >= stake.lockedUntil ? (
+          <Button colorScheme="blue" onClick={() => unstake(stake.stakeId)}>
+            Unstake
+          </Button>
+        ) : (
+          <Text>Locked</Text>
+        )}
+      </Td>
+    </Tr>
   );
 };
 

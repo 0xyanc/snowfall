@@ -17,6 +17,7 @@ export function useContractProvider() {
 
 export const ContractProvider = ({ children }) => {
   const snowERC20Address = process.env.NEXT_PUBLIC_SNOW_ERC20;
+  const lpERC20Address = process.env.NEXT_PUBLIC_LP_ERC20;
   const singlePoolAddress = process.env.NEXT_PUBLIC_SC_SINGLE_POOL;
   const lpPoolAddress = process.env.NEXT_PUBLIC_SC_LP_POOL;
   let provider = useProvider();
@@ -30,6 +31,18 @@ export const ContractProvider = ({ children }) => {
   });
   let writeSnowERC20Contract = useContract({
     address: snowERC20Address,
+    abi: SnowfallERC20Contract.abi,
+    signerOrProvider: signer,
+  });
+
+  // init read and write contracts for LP token
+  let readLPERC20Contract = useContract({
+    address: lpERC20Address,
+    abi: SnowfallERC20Contract.abi,
+    signerOrProvider: provider,
+  });
+  let writeLPERC20Contract = useContract({
+    address: lpERC20Address,
     abi: SnowfallERC20Contract.abi,
     signerOrProvider: signer,
   });
@@ -65,6 +78,8 @@ export const ContractProvider = ({ children }) => {
       value={{
         readSnowERC20Contract,
         writeSnowERC20Contract,
+        readLPERC20Contract,
+        writeLPERC20Contract,
         readSinglePoolContract,
         writeSinglePoolContract,
         readLpPoolContract,

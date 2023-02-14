@@ -10,28 +10,37 @@ import {
   SliderMark,
   SliderThumb,
   SliderTrack,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import Vesting from "../Vesting/Vesting";
 
 const Staking = () => {
   const { address, isConnected } = useAccount();
-  const { readSnowERC20Contract, writeSnowERC20Contract, readSinglePoolContract, writeSinglePoolContract } =
-    useContractProvider();
+  const {
+    readSnowERC20Contract,
+    writeSnowERC20Contract,
+    readSinglePoolContract,
+    writeSinglePoolContract,
+    readLpERC20Contract,
+    writeLpERC20Contract,
+  } = useContractProvider();
 
   const [amountToStake, setAmountToStake] = useState(0);
-  const [pendingRewards, setPendingRewards] = useState(0);
   const [snowAllowance, setSnowAllowance] = useState(0);
+  const [lpAllowance, setLpAllowance] = useState(0);
   const [lockValue, setLockValue] = useState(12);
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     if (isConnected) {
-      getPendingRewards();
       getSnowAllowance();
     }
   }, [address, isConnected]);
@@ -41,10 +50,9 @@ const Staking = () => {
     setSnowAllowance(allowance.toString());
   };
 
-  const getPendingRewards = async () => {
-    const pendingRewards = await readSinglePoolContract.pendingRewards(address);
-    const formattedPendingRewards = ethers.utils.formatEther(pendingRewards);
-    setPendingRewards(formattedPendingRewards);
+  const getLpAllowance = async () => {
+    const allowance = await readLpERC20Contract.allowance(address, process.env.NEXT_PUBLIC_SC_LP_POOL);
+    setLpAllowance(allowance.toString());
   };
 
   const approveSnow = async () => {
@@ -55,6 +63,16 @@ const Staking = () => {
       );
       await tx.wait();
       setSnowAllowance(ethers.constants.MaxUint256);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const approveLp = async () => {
+    try {
+      const tx = await writeLpERC20Contract.approve(process.env.NEXT_PUBLIC_SC_LP_POOL, ethers.constants.MaxUint256);
+      await tx.wait();
+      setLpAllowance(ethers.constants.MaxUint256);
     } catch (err) {
       console.error(err);
     }
@@ -87,16 +105,8 @@ const Staking = () => {
   return (
     <>
       <Flex p="2rem" alignItems="center" direction="column">
-        <Heading>Snowfall Staking DApp</Heading>
         {isConnected ? (
           <>
-            <Text>You have {pendingRewards} SNOW rewards to claim.</Text>
-            <Button colorScheme="purple" onClick={() => getPendingRewards()}>
-              Refresh
-            </Button>
-            <Button colorScheme="purple" onClick={() => claimRewards()}>
-              Claim
-            </Button>
             <Heading mt="2rem">Stake</Heading>
             <Flex mt="1rem" direction="column">
               <Input
@@ -158,7 +168,6 @@ const Staking = () => {
                 </Button>
               )}
             </Flex>
-            <Vesting />
           </>
         ) : (
           <Text mt="1rem">Please connect your wallet to start</Text>
