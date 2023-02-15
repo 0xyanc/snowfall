@@ -1,47 +1,29 @@
 import { useContractProvider } from "@/context/ContractContext";
-import { useStakesProvider } from "@/context/StakesContext";
-import {
-  Button,
-  Flex,
-  Heading,
-  Input,
-  Slider,
-  SliderFilledTrack,
-  SliderMark,
-  SliderThumb,
-  SliderTrack,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import Stake from "../Stake/Stake";
 
 const Staking = () => {
   const { address, isConnected } = useAccount();
   const {
     readSnowERC20Contract,
     writeSnowERC20Contract,
-    readSinglePoolContract,
     writeSinglePoolContract,
+    writeLpPoolContract,
     readLpERC20Contract,
     writeLpERC20Contract,
+    readLpPoolContract,
   } = useContractProvider();
 
-  const [amountToStake, setAmountToStake] = useState(0);
   const [snowAllowance, setSnowAllowance] = useState(0);
-  const [lpAllowance, setLpAllowance] = useState(0);
-  const [lockValue, setLockValue] = useState(12);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [lpTokenAllowance, setLpTokenAllowance] = useState(0);
 
   useEffect(() => {
     if (isConnected) {
       getSnowAllowance();
+      getLpTokenAllowance();
     }
   }, [address, isConnected]);
 
@@ -50,9 +32,10 @@ const Staking = () => {
     setSnowAllowance(allowance.toString());
   };
 
-  const getLpAllowance = async () => {
+  const getLpTokenAllowance = async () => {
     const allowance = await readLpERC20Contract.allowance(address, process.env.NEXT_PUBLIC_SC_LP_POOL);
-    setLpAllowance(allowance.toString());
+    console.log(`Allowance ${allowance.toString()} from ${address} to ${process.env.NEXT_PUBLIC_SC_LP_POOL}`);
+    setLpTokenAllowance(allowance.toString());
   };
 
   const approveSnow = async () => {
@@ -68,25 +51,44 @@ const Staking = () => {
     }
   };
 
-  const approveLp = async () => {
+  const approveLpToken = async () => {
     try {
       const tx = await writeLpERC20Contract.approve(process.env.NEXT_PUBLIC_SC_LP_POOL, ethers.constants.MaxUint256);
       await tx.wait();
-      setLpAllowance(ethers.constants.MaxUint256);
+      setLpTokenAllowance(ethers.constants.MaxUint256);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const stake = async () => {
+  const stakeSingle = async (stakeAmount, lockDurationInMonths) => {
     try {
-      const amount = ethers.utils.parseUnits(amountToStake, "ether");
+      const amount = ethers.utils.parseUnits(stakeAmount, "ether");
       // calculate lock duration in seconds
       const unlockDate = new Date(Date.now());
-      unlockDate.setMonth(unlockDate.getMonth() + lockValue);
+      unlockDate.setMonth(unlockDate.getMonth() + lockDurationInMonths);
       const lockInSeconds = Math.floor((unlockDate - Date.now()) / 1000);
-      console.log(lockInSeconds);
       const tx = await writeSinglePoolContract.stake(amount, lockInSeconds);
+      await tx.wait();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const stakeLp = async (stakeAmount, lockDurationInMonths) => {
+    try {
+      const poolToken = await readLpPoolContract.poolToken();
+      const snowToken = await readLpPoolContract.snowToken();
+      const lpToken = await readLpPoolContract.lpToken();
+      console.log(`poolToken ${poolToken}`);
+      console.log(`snowToken ${snowToken}`);
+      console.log(`lpToken ${lpToken}`);
+      const amount = ethers.utils.parseUnits(stakeAmount, "ether");
+      // calculate lock duration in seconds
+      const unlockDate = new Date(Date.now());
+      unlockDate.setMonth(unlockDate.getMonth() + lockDurationInMonths);
+      const lockInSeconds = Math.floor((unlockDate - Date.now()) / 1000);
+      const tx = await writeLpPoolContract.stake(amount, lockInSeconds);
       await tx.wait();
     } catch (err) {
       console.error(err);
@@ -107,67 +109,8 @@ const Staking = () => {
       <Flex p="2rem" alignItems="center" direction="column">
         {isConnected ? (
           <>
-            <Heading mt="2rem">Stake</Heading>
-            <Flex mt="1rem" direction="column">
-              <Input
-                placeholder="Amount to Stake"
-                value={amountToStake}
-                onChange={(e) => setAmountToStake(e.target.value)}
-              />
-              <Slider
-                mt="1rem"
-                mb="1rem"
-                id="slider"
-                defaultValue={12}
-                min={0}
-                max={60}
-                colorScheme="teal"
-                onChange={(lock) => setLockValue(lock)}
-                onMouseEnter={() => setShowTooltip(true)}
-                onMouseLeave={() => setShowTooltip(false)}
-              >
-                <SliderMark value={0} mt="1" ml="-2.5" fontSize="sm">
-                  0m
-                </SliderMark>
-                <SliderMark value={12} mt="1" ml="-2.5" fontSize="sm">
-                  1y
-                </SliderMark>
-                <SliderMark value={24} mt="1" ml="-2.5" fontSize="sm">
-                  2y
-                </SliderMark>
-                <SliderMark value={36} mt="1" ml="-2.5" fontSize="sm">
-                  3y
-                </SliderMark>
-                <SliderMark value={48} mt="1" ml="-2.5" fontSize="sm">
-                  4y
-                </SliderMark>
-                <SliderMark value={60} mt="1" ml="-2.5" fontSize="sm">
-                  5y
-                </SliderMark>
-                <SliderTrack>
-                  <SliderFilledTrack />
-                </SliderTrack>
-                <Tooltip
-                  hasArrow
-                  bg="teal.500"
-                  color="white"
-                  placement="top"
-                  isOpen={showTooltip}
-                  label={`${lockValue} months`}
-                >
-                  <SliderThumb />
-                </Tooltip>
-              </Slider>
-              {snowAllowance === "0" ? (
-                <Button mt="1rem" colorScheme="purple" onClick={() => approveSnow()}>
-                  Approve
-                </Button>
-              ) : (
-                <Button mt="1rem" colorScheme="green" onClick={() => stake()}>
-                  Stake
-                </Button>
-              )}
-            </Flex>
+            <Stake pool="Snowfall" stake={stakeSingle} approve={approveSnow} allowance={snowAllowance} />
+            <Stake pool="Snowfall/ETH" stake={stakeLp} approve={approveLpToken} allowance={lpTokenAllowance} />
           </>
         ) : (
           <Text mt="1rem">Please connect your wallet to start</Text>

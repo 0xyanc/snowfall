@@ -64,29 +64,31 @@ const Dashboard = () => {
 
   return (
     <>
-      <Flex p="2rem" alignItems="center" direction="column">
+      <Flex direction="column" w="100%" alignItems="center">
         <Heading>Snowfall Staking DApp</Heading>
-        {isConnected ? (
-          <>
-            <PendingReward
+        <Flex p="1rem">
+          {isConnected ? (
+            <>
+              {/* <PendingReward
               heading="Total Pending Rewards"
-              pendingRewards={singlePendingRewards}
+              pendingRewards={}
               claimRewards={claimBothRewards}
-            />
-            <PendingReward
-              heading="Single Pool Pending Rewards"
-              pendingRewards={singlePendingRewards}
-              claimRewards={claimSingleRewards}
-            />
-            <PendingReward
-              heading="LP Pool Pending Rewards"
-              pendingRewards={lpPendingRewards}
-              claimRewards={claimLpRewards}
-            />
-          </>
-        ) : (
-          <Text mt="1rem">Please connect your wallet to start</Text>
-        )}
+            /> */}
+              <PendingReward
+                heading="Single Pool Pending Rewards"
+                pendingRewards={singlePendingRewards}
+                claimRewards={claimSingleRewards}
+              />
+              <PendingReward
+                heading="LP Pool Pending Rewards"
+                pendingRewards={lpPendingRewards}
+                claimRewards={claimLpRewards}
+              />
+            </>
+          ) : (
+            <Text mt="1rem">Please connect your wallet to start</Text>
+          )}
+        </Flex>
       </Flex>
     </>
   );

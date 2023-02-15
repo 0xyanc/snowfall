@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import styles from '@/styles/Home.module.css'
-import VestingList from '@/components/Vesting/VestingList'
+import VestingList from '@/components/VestingList/VestingList'
 
 export default function Home() {
   return (

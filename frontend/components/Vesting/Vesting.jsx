@@ -1,13 +1,17 @@
 import { useContractProvider } from "@/context/ContractContext";
 import { Button, Tr, Td, Text } from "@chakra-ui/react";
-import { useEffect } from "react";
 
 const Vesting = ({ stake, date }) => {
   const { writeSinglePoolContract, writeLpPoolContract } = useContractProvider();
 
   const unstake = async (id) => {
     try {
-      const tx = await writeSinglePoolContract.unstake(id);
+      let tx;
+      if (stake.pool === "Single") {
+        tx = await writeSinglePoolContract.unstake(id);
+      } else {
+        tx = await writeLpPoolContract.unstake(id);
+      }
       await tx.wait();
     } catch (err) {
       console.error(err);

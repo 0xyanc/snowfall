@@ -1,8 +1,9 @@
 import { createContext, useContext } from "react";
 import { useContract, useProvider, useSigner } from "wagmi";
-import SnowfallERC20Contract from "../contracts/SnowfallERC20.json";
-import SnowfallPoolContract from "../contracts/SnowfallPool.json";
-import SnowfallEthPoolContract from "../contracts/SnowfallEthPool.json";
+import SnowfallERC20Contract from "../abi/SnowfallERC20.json";
+import IERC20Contract from "../abi/IERC20.json";
+import SnowfallPoolContract from "../abi/SnowfallPool.json";
+import SnowfallEthPoolContract from "../abi/SnowfallEthPool.json";
 
 const ContractContext = createContext();
 
@@ -36,14 +37,14 @@ export const ContractProvider = ({ children }) => {
   });
 
   // init read and write contracts for LP token
-  let readLPERC20Contract = useContract({
+  let readLpERC20Contract = useContract({
     address: lpERC20Address,
-    abi: SnowfallERC20Contract.abi,
+    abi: IERC20Contract.abi,
     signerOrProvider: provider,
   });
-  let writeLPERC20Contract = useContract({
+  let writeLpERC20Contract = useContract({
     address: lpERC20Address,
-    abi: SnowfallERC20Contract.abi,
+    abi: IERC20Contract.abi,
     signerOrProvider: signer,
   });
 
@@ -78,8 +79,8 @@ export const ContractProvider = ({ children }) => {
       value={{
         readSnowERC20Contract,
         writeSnowERC20Contract,
-        readLPERC20Contract,
-        writeLPERC20Contract,
+        readLpERC20Contract,
+        writeLpERC20Contract,
         readSinglePoolContract,
         writeSinglePoolContract,
         readLpPoolContract,
