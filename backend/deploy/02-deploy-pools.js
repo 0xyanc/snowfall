@@ -8,12 +8,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deployer } = await getNamedAccounts()
     const snowERC20 = await deployments.get("SnowfallERC20")
     const snowERC20Address = snowERC20.address
-    // log(snowERC20Address)
-    // const snow = await ethers.getContractFactory("SnowfallERC20")
-    // const Snowfall = await snow.attach(snowERC20Address)
-    // log(Snowfall)
     const snowERC20Contract = await ethers.getContractAt("SnowfallERC20", snowERC20Address)
-    // log(snowERC20Contract)
 
     log("--------------------------------------")
     let args = [snowERC20Address, snowERC20Address]

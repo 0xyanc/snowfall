@@ -8,6 +8,7 @@ require("solidity-coverage")
 const PK = process.env.PK || "";
 const ETHERSCAN = process.env.ETHERSCAN || "";
 const ALCHEMY_GOERLI = process.env.ALCHEMY_GOERLI || "";
+const ALCHEMY_MAINNET = process.env.ALCHEMY_MAINNET || "";
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -15,6 +16,12 @@ module.exports = {
     localhost: {
       url: "http://127.0.0.1:8545",
       chainId: 31337
+    },
+    hardhat: {
+      chainId: 31337,
+      forking: {
+        url: ALCHEMY_MAINNET
+      }
     },
     goerli: {
       url: ALCHEMY_GOERLI,
@@ -27,6 +34,12 @@ module.exports = {
     compilers: [
       {
         version: "0.8.18"
+      },
+      {
+        version: "0.6.2"
+      },
+      {
+        version: "0.5.0"
       }
     ]
   },
