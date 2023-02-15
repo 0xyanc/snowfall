@@ -1,6 +1,4 @@
-import { useContractProvider } from "@/context/ContractContext";
-import { Button, Tr, Td, Text, Card, CardHeader, Heading, CardBody, Stack, Box } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { Button, Text, Card, CardHeader, Heading, CardBody, Box } from "@chakra-ui/react";
 
 const PendingReward = ({ heading, pendingRewards, claimRewards }) => {
   return (
@@ -11,9 +9,6 @@ const PendingReward = ({ heading, pendingRewards, claimRewards }) => {
 
       <CardBody>
         <Box>
-          {/* <Heading size="xs" textTransform="uppercase">
-            You have {Number(pendingRewards).toFixed(2)} SNOW rewards to claim.
-          </Heading> */}
           <Text>
             You have <Text as="b"> {Number(pendingRewards).toFixed(2)} </Text> SNOW rewards to claim.
           </Text>

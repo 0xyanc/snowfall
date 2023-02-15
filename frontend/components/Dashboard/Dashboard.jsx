@@ -1,5 +1,5 @@
 import { useContractProvider } from "@/context/ContractContext";
-import { Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { Flex, Heading, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -7,7 +7,7 @@ import PendingReward from "../PendingReward/PendingReward";
 
 const Dashboard = () => {
   const { address, isConnected } = useAccount();
-  const { readSinglePoolContract, writeSinglePoolContract, readLpPoolContract, writeLpPoolContract } =
+  const { readSinglePoolContract, writeSinglePoolContract, readLpPoolContract, writeLpPoolContract, provider } =
     useContractProvider();
 
   const [singlePendingRewards, setSinglePendingRewards] = useState(0);
@@ -17,13 +17,32 @@ const Dashboard = () => {
     if (isConnected) {
       getSinglePendingRewards();
       getLpPendingRewards();
+      subscribeToSyncedEvents();
     }
+    return () => {
+      readSinglePoolContract.off("Synced", updatePendingRewards);
+      readLpPoolContract.off("Synced", updatePendingRewards);
+    };
   }, [address, isConnected]);
 
+  const subscribeToSyncedEvents = async () => {
+    const startBlockNumber = await provider.getBlockNumber();
+    readSinglePoolContract.on("Synced", (event) => {
+      updatePendingRewards(event, startBlockNumber);
+    });
+    readLpPoolContract.on("Synced", (event) => {
+      updatePendingRewards(event);
+    });
+  };
+
+  const updatePendingRewards = (event, startBlockNumber) => {
+    if (event.blockNumber <= startBlockNumber) return;
+    getSinglePendingRewards();
+    getLpPendingRewards();
+  };
   const getSinglePendingRewards = async () => {
     const pendingRewards = await readSinglePoolContract.pendingRewards(address);
     const formattedPendingRewards = ethers.utils.formatEther(pendingRewards);
-    console.log(formattedPendingRewards);
     setSinglePendingRewards(formattedPendingRewards);
   };
 

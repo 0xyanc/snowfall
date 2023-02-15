@@ -1,5 +1,5 @@
 import { useContractProvider } from "@/context/ContractContext";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Heading, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -14,7 +14,6 @@ const Staking = () => {
     writeLpPoolContract,
     readLpERC20Contract,
     writeLpERC20Contract,
-    readLpPoolContract,
   } = useContractProvider();
 
   const [snowAllowance, setSnowAllowance] = useState(0);
@@ -34,7 +33,6 @@ const Staking = () => {
 
   const getLpTokenAllowance = async () => {
     const allowance = await readLpERC20Contract.allowance(address, process.env.NEXT_PUBLIC_SC_LP_POOL);
-    console.log(`Allowance ${allowance.toString()} from ${address} to ${process.env.NEXT_PUBLIC_SC_LP_POOL}`);
     setLpTokenAllowance(allowance.toString());
   };
 
@@ -77,12 +75,6 @@ const Staking = () => {
 
   const stakeLp = async (stakeAmount, lockDurationInMonths) => {
     try {
-      const poolToken = await readLpPoolContract.poolToken();
-      const snowToken = await readLpPoolContract.snowToken();
-      const lpToken = await readLpPoolContract.lpToken();
-      console.log(`poolToken ${poolToken}`);
-      console.log(`snowToken ${snowToken}`);
-      console.log(`lpToken ${lpToken}`);
       const amount = ethers.utils.parseUnits(stakeAmount, "ether");
       // calculate lock duration in seconds
       const unlockDate = new Date(Date.now());
@@ -95,27 +87,18 @@ const Staking = () => {
     }
   };
 
-  const claimRewards = async () => {
-    try {
-      const tx = await writeSinglePoolContract.claimYieldRewards();
-      await tx.wait();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <>
-      <Flex p="2rem" alignItems="center" direction="column">
-        {isConnected ? (
-          <>
-            <Stake pool="Snowfall" stake={stakeSingle} approve={approveSnow} allowance={snowAllowance} />
-            <Stake pool="Snowfall/ETH" stake={stakeLp} approve={approveLpToken} allowance={lpTokenAllowance} />
-          </>
-        ) : (
-          <Text mt="1rem">Please connect your wallet to start</Text>
-        )}
-      </Flex>
+      {isConnected ? (
+        <Flex p="2rem" alignItems="center" direction="column">
+          <Stake pool="Snowfall" stake={stakeSingle} approve={approveSnow} allowance={snowAllowance} />
+          <Stake pool="Snowfall/ETH" stake={stakeLp} approve={approveLpToken} allowance={lpTokenAllowance} />
+        </Flex>
+      ) : (
+        <Flex m="auto">
+          <Heading mt="1rem">Please connect your wallet to start</Heading>
+        </Flex>
+      )}
     </>
   );
 };

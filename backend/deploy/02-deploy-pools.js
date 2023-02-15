@@ -1,17 +1,30 @@
 const { keccak256, toUtf8Bytes } = require("ethers")
 const { network, ethers } = require("hardhat")
-const { developmentChains } = require("../helper-hardhat-config")
+const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
     const { deploy, log } = deployments
     const { deployer } = await getNamedAccounts()
+    const chainId = network.config.chainId
+
     const snowERC20 = await deployments.get("SnowfallERC20")
     const snowERC20Address = snowERC20.address
     const snowERC20Contract = await ethers.getContractAt("SnowfallERC20", snowERC20Address)
 
+    const uniswapRouterAddress = networkConfig[chainId].UniswapV2Router02
+    const IUniswapV2Router02 = await ethers.getContractAt("IUniswapV2Router02", uniswapRouterAddress, deployer)
+    const wethAddress = await IUniswapV2Router02.WETH()
+
+    log("*** Retrieve SNOW/ETH LP Token address ***")
+    //retrieve lp token address 
+    const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
+    const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)
+    const lpTokenAddress = await IUniswapV2Factory.getPair(snowERC20Address, wethAddress)
+    log(`---- LP Token address: ${lpTokenAddress} ----`)
+
     log("--------------------------------------")
-    let args = [snowERC20Address, snowERC20Address]
+    let args = [snowERC20Address, lpTokenAddress]
     log("*** Deploying SnowfallPool ***")
     const singlePool = await deploy("SnowfallPool", {
         from: deployer,
@@ -28,8 +41,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     })
 
     log("*** Grant MINTER_ROLE to Single Pool ***")
-    // log(keccak256("MINTER_ROLE"))
-    // log(snowERC20Contract)
     snowERC20Contract.grantRole("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6", singlePool.address)
 
 

@@ -1,4 +1,5 @@
 import { useContractProvider } from "@/context/ContractContext";
+import { WEIGHT_MULTIPLIER } from "@/util/Constants";
 import { Button, Tr, Td, Text } from "@chakra-ui/react";
 
 const Vesting = ({ stake, date }) => {
@@ -20,8 +21,8 @@ const Vesting = ({ stake, date }) => {
   return (
     <Tr>
       <Td>{stake.pool === "Single" ? "Snowfall" : "Snowfall/ETH"}</Td>
-      <Td>{stake.value}</Td>
-      <Td>{stake.weight}</Td>
+      <Td>{Number(stake.value).toFixed(2)}</Td>
+      <Td>{Number(stake.weight / WEIGHT_MULTIPLIER).toFixed(2)}</Td>
       <Td>
         {stake.stakeTime.toLocaleDateString()} {stake.stakeTime.toLocaleTimeString()}
       </Td>

@@ -204,7 +204,7 @@ abstract contract CorePool is Ownable {
         totalTokensInPool += _value;
 
         // transfer `_value`
-        SnowfallERC20(snowToken).transferFrom(
+        IERC20(poolToken).transferFrom(
             address(msg.sender),
             address(this),
             _value

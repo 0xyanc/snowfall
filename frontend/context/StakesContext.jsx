@@ -106,7 +106,7 @@ export const StakesProvider = ({ children }) => {
       lockedUntil: new Date(lockedUntil.toString() * 1000),
       pool,
       id: stakeId + "-" + pool,
-      weight: stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
+      weight: stakeWeight.toString(),
     };
     let stakeList = [...stakesRef.current, newStake];
     stakeList.sort((a, b) => a.lockedUntil - b.lockedUntil);
@@ -165,7 +165,7 @@ export const StakesProvider = ({ children }) => {
         lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
         pool: "Single",
         id: event.args.stakeId.toString() + "-Single",
-        weight: event.args.stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
+        weight: event.args.stakeWeight.toString(),
       });
     });
     // remove the single pool unstakes from the list
@@ -183,7 +183,7 @@ export const StakesProvider = ({ children }) => {
         lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
         pool: "LP",
         id: event.args.stakeId.toString() + "-LP",
-        weight: event.args.stakeWeight.div(WEIGHT_MULTIPLIER).toString(),
+        weight: event.args.stakeWeight.toString(),
       });
     });
     // remove the single pool unstakes from the list
