@@ -44,7 +44,7 @@ library Stake {
     /// @dev Claimed yield is always locked for 1 year there weight is 2
     uint256 internal constant YIELD_STAKE_WEIGHT_MULTIPLIER = 2 * 1e6;
 
-    /// @dev initial reward per second 39,499,007,936,507,900 (scaled by 1e18)
+    /// @dev initial reward per second 0.0394990079365079 (scaled by 1e18)
     uint256 internal constant INITIAL_TOTAL_REWARD_PER_SECOND =
         39499007936507900;
 

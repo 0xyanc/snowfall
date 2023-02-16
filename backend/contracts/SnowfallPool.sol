@@ -23,7 +23,7 @@ contract SnowfallPool is CorePool {
      * @dev claims all pendingYield from the sender as a 1-year locked stake in the Single Pool
      */
     function claimYieldRewards() external override {
-        // get link to a user data structure, we will write into it later
+        // get link to a user data structure
         User storage user = users[msg.sender];
         // update user state
         _updateReward(msg.sender);
@@ -40,9 +40,7 @@ contract SnowfallPool is CorePool {
             Stake.YIELD_STAKE_WEIGHT_MULTIPLIER;
         // the yield will be locked for a year
         uint64 lockUntil = uint64(block.timestamp + Stake.YIELD_STAKE_PERIOD);
-        // if the pool is ILV Pool - create new ILV stake
-        // and save it - push it into stakes array
-
+        // create new stake and push it into stakes array
         Stake.Data memory newStake = Stake.Data({
             value: uint120(pendingYieldToClaim),
             lockedFrom: uint64(block.timestamp),

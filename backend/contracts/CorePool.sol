@@ -246,20 +246,15 @@ abstract contract CorePool is Ownable {
         _updateReward(msg.sender);
         // store weighted shares of this stake
         uint256 stakeWeightedShares = Stake.weightedShares(userStake);
-        // value used to save new weighted shares of this stake
-        uint256 newWeightedShares;
 
         // deletes stake struct, no need to save new weight because it stays 0
         delete user.stakes[_stakeId];
         // update user total weighted shares with unstaked amount
         user.totalWeightedShares = uint128(
-            user.totalWeightedShares - stakeWeightedShares + newWeightedShares
+            user.totalWeightedShares - stakeWeightedShares
         );
         // update global weight variable with unstaked amount
-        totalPoolWeightedShares =
-            totalPoolWeightedShares -
-            stakeWeightedShares +
-            newWeightedShares;
+        totalPoolWeightedShares = totalPoolWeightedShares - stakeWeightedShares;
         // update global pool token count
         totalTokensInPool -= stakeValue;
 
@@ -308,10 +303,10 @@ abstract contract CorePool is Ownable {
         User storage user = users[_staker];
 
         // make sure the values are up to date in order to calculate pending rewards
-        uint256 multiplier = block.timestamp > endTime
+        uint256 secondsPassed = block.timestamp > endTime
             ? endTime - lastYieldDistribution
             : block.timestamp - lastYieldDistribution;
-        uint256 rewards = multiplier * rewardPerSecond;
+        uint256 rewards = secondsPassed * rewardPerSecond;
 
         // recalculated value for `yieldRewardsPerShare`
         uint256 newYieldRewardsPerShare = Stake.getRewardPerShare(
@@ -397,10 +392,9 @@ abstract contract CorePool is Ownable {
         }
 
         // to calculate the reward we need to know how many seconds passed, and reward per second
-        uint256 currentTimestamp = block.timestamp > endTime
-            ? endTime
-            : block.timestamp;
-        uint256 secondsPassed = currentTimestamp - lastYieldDistribution;
+        uint256 secondsPassed = block.timestamp > endTime
+            ? endTime - lastYieldDistribution
+            : block.timestamp - lastYieldDistribution;
 
         // calculate the reward
         uint256 reward = secondsPassed * rewardPerSecond;
@@ -411,7 +405,7 @@ abstract contract CorePool is Ownable {
             totalPoolWeightedShares
         );
         // set the lastYieldDistribution
-        lastYieldDistribution = uint64(currentTimestamp);
+        lastYieldDistribution = uint64(block.timestamp);
 
         // emit Synced event
         emit Synced(msg.sender, yieldRewardsPerShare, lastYieldDistribution);

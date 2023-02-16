@@ -3,7 +3,8 @@ require("dotenv").config()
 require("@nomiclabs/hardhat-etherscan")
 require("hardhat-deploy");
 require("hardhat-gas-reporter")
-require("solidity-coverage")
+// require("solidity-coverage")
+require("@nomicfoundation/hardhat-chai-matchers")
 
 const PK = process.env.PK || "";
 const ETHERSCAN = process.env.ETHERSCAN || "";

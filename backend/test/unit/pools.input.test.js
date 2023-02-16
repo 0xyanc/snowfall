@@ -45,6 +45,10 @@ describe("Unit tests of Error management for the Staking contracts", function ()
             await expect(singlePool.stake(0, 1))
                 .to.be.revertedWithCustomError(singlePool, "CorePool__ValueCannotBeZero")
         })
+        it("should revert if the lock duration is lower than the min stake period", async function () {
+            await expect(singlePool.stake(1, 0))
+                .to.be.revertedWithCustomError(singlePool, "CorePool__InvalidLockPeriod")
+        })
         it("should revert if the lock duration is higher than the max stake period", async function () {
             const maxStakePeriod = 1827 * 24 * 3600
             await expect(singlePool.stake(1, maxStakePeriod + 1))
