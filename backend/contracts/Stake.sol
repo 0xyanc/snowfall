@@ -30,13 +30,13 @@ library Stake {
 
     /// @dev Minimum period that someone can lock a stake for - 1 month
     // uint256 internal constant MIN_STAKE_PERIOD = 30 days;
-    uint256 internal constant MIN_STAKE_PERIOD = 0 days;
+    uint256 internal constant MIN_STAKE_PERIOD = 1 seconds;
 
     /// @dev Fixed lock period for claimed yield - 1 year
     uint256 internal constant YIELD_STAKE_PERIOD = 365 days;
 
     /// @dev Maximum period that someone can lock a stake for - 5 years
-    uint256 internal constant MAX_STAKE_PERIOD = 1825 days;
+    uint256 internal constant MAX_STAKE_PERIOD = 1827 days;
 
     /// @dev Rewards per weight are stored multiplied by 1e20.
     uint256 internal constant REWARD_PER_SHARE_MULTIPLIER = 1e20;

@@ -20,7 +20,9 @@ module.exports = {
     hardhat: {
       chainId: 31337,
       forking: {
-        url: ALCHEMY_MAINNET
+        url: ALCHEMY_MAINNET,
+        // mainnet block of Uniswap V2 deployment
+        blockNumber: 10210000
       }
     },
     goerli: {

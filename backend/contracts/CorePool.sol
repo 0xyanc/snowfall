@@ -145,8 +145,8 @@ abstract contract CorePool is Ownable {
         }
         singlePoolAddress = _singlePoolAddress;
         lpPoolAddress = _lpPoolAddress;
-        // set duration of yield farming to 5 years = 260 weeks
-        endTime = uint32(block.timestamp + 260 weeks);
+        // set duration of yield farming to 5 years = 1827 days
+        endTime = uint32(block.timestamp + 1827 days);
         // init lastRewardPerSecUpdate
         lastRewardPerSecUpdate = uint32(block.timestamp);
         // init lastYieldDistribution
@@ -186,8 +186,6 @@ abstract contract CorePool is Ownable {
             Stake.BASE_WEIGHT);
         // stake weight formula rewards for locking
         uint256 stakeWeightedShares = weight * _value;
-        // makes sure stakeWeight is valid
-        assert(stakeWeightedShares > 0);
         // create and save the stake (append it to stakes array)
         Stake.Data memory userStake = Stake.Data({
             value: uint120(_value),
@@ -301,33 +299,25 @@ abstract contract CorePool is Ownable {
         if (_staker == address(0)) {
             revert CorePool__InvalidStakerAddress();
         }
-        // `newYieldRewardsPerWeight` will be the stored or recalculated value for `yieldRewardsPerWeight`
-        uint256 newYieldRewardsPerShare;
-        // // gas savings
-        // uint256 _lastYieldDistribution = lastYieldDistribution;
+        // no one has staked yet
+        if (totalPoolWeightedShares == 0) {
+            return 0;
+        }
 
         // based on the rewards per weight value, calculate pending rewards;
         User storage user = users[_staker];
 
-        // if smart contract state was not updated recently, `yieldRewardsPerWeight` value
-        // is outdated and we need to recalculate it in order to calculate pending rewards correctly
-        if (
-            block.timestamp > lastYieldDistribution &&
-            totalPoolWeightedShares != 0
-        ) {
-            uint256 multiplier = block.timestamp > endTime
-                ? endTime - lastYieldDistribution
-                : block.timestamp - lastYieldDistribution;
-            uint256 rewards = multiplier * rewardPerSecond;
+        // make sure the values are up to date in order to calculate pending rewards
+        uint256 multiplier = block.timestamp > endTime
+            ? endTime - lastYieldDistribution
+            : block.timestamp - lastYieldDistribution;
+        uint256 rewards = multiplier * rewardPerSecond;
 
-            // recalculated value for `yieldRewardsPerWeight`
-            newYieldRewardsPerShare =
-                Stake.getRewardPerShare(rewards, totalPoolWeightedShares) +
-                yieldRewardsPerShare;
-        } else {
-            // if smart contract state is up to date, we don't recalculate
-            newYieldRewardsPerShare = yieldRewardsPerShare;
-        }
+        // recalculated value for `yieldRewardsPerShare`
+        uint256 newYieldRewardsPerShare = Stake.getRewardPerShare(
+            rewards,
+            totalPoolWeightedShares
+        ) + yieldRewardsPerShare;
 
         return
             Stake.earned(

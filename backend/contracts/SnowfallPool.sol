@@ -21,7 +21,6 @@ contract SnowfallPool is CorePool {
 
     /**
      * @dev claims all pendingYield from the sender as a 1-year locked stake in the Single Pool
-     *
      */
     function claimYieldRewards() external override {
         // get link to a user data structure, we will write into it later
