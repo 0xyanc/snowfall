@@ -52,24 +52,6 @@ const Dashboard = () => {
     setLpPendingRewards(formattedPendingRewards);
   };
 
-  const claimSingleRewards = async () => {
-    try {
-      const tx = await writeSinglePoolContract.claimYieldRewards();
-      await tx.wait();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const claimLpRewards = async () => {
-    try {
-      const tx = await writeLpPoolContract.claimYieldRewards();
-      await tx.wait();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const claimBothRewards = async () => {
     try {
       const txSingle = await writeSinglePoolContract.claimYieldRewards();
@@ -93,16 +75,8 @@ const Dashboard = () => {
               pendingRewards={}
               claimRewards={claimBothRewards}
             /> */}
-              <PendingReward
-                heading="Single Pool Pending Rewards"
-                pendingRewards={singlePendingRewards}
-                claimRewards={claimSingleRewards}
-              />
-              <PendingReward
-                heading="LP Pool Pending Rewards"
-                pendingRewards={lpPendingRewards}
-                claimRewards={claimLpRewards}
-              />
+              <PendingReward pool="Single" pendingRewards={singlePendingRewards} />
+              <PendingReward pool="LP" pendingRewards={lpPendingRewards} />
             </>
           ) : (
             <Text mt="1rem">Please connect your wallet to start</Text>

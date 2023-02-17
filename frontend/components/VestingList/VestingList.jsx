@@ -1,5 +1,5 @@
 import { useStakesProvider } from "@/context/StakesContext";
-import { Tr, Text, Flex, TableContainer, Table, Thead, Th, Tbody, Heading } from "@chakra-ui/react";
+import { Tr, Flex, TableContainer, Table, Thead, Th, Tbody, Heading } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Vesting from "../Vesting/Vesting";
@@ -15,10 +15,10 @@ const VestingList = () => {
   return (
     <>
       {isConnected ? (
-        <Flex direction="column" alignItems="center" alignContent="center">
-          <Text as="b">Vesting stakes</Text>
-          <TableContainer>
-            <Table variant="simple">
+        <Flex w="100%" direction="column" alignItems="center" alignContent="center">
+          <Heading as="b">Vesting stakes</Heading>
+          <TableContainer mt="1rem">
+            <Table variant="striped" colorScheme="teal">
               <Thead>
                 <Tr>
                   <Th>Pool</Th>
