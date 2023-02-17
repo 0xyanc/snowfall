@@ -13,6 +13,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import Layout from '@/components/Layout/Layout';
 import { ContractProvider } from '@/context/ContractContext';
 import { StakesProvider } from '@/context/StakesContext';
+import { PriceProvider } from '@/context/PriceContext';
 const { chains, provider } = configureChains(
   [hardhat],
   [
@@ -38,11 +39,13 @@ export default function App({ Component, pageProps }) {
       <RainbowKitProvider chains={chains}>
         <ChakraProvider>
           <ContractProvider>
-            <StakesProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            </StakesProvider>
+            <PriceProvider>
+              <StakesProvider>
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              </StakesProvider>
+            </PriceProvider>
           </ContractProvider>
         </ChakraProvider>
       </RainbowKitProvider>

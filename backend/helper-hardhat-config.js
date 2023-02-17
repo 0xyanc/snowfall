@@ -10,10 +10,13 @@ const networkConfig = {
         UniswapV2Factory: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
     }
 }
-
+const DECIMALS = "18"
+const INITIAL_PRICE = "170000000000000000000"
 const developmentChains = ["hardhat", "localhost"]
 
 module.exports = {
     networkConfig,
-    developmentChains
+    developmentChains,
+    DECIMALS,
+    INITIAL_PRICE,
 }

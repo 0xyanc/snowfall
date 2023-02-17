@@ -4,6 +4,7 @@ import SnowfallERC20Contract from "../abi/SnowfallERC20.json";
 import IERC20Contract from "../abi/IERC20.json";
 import SnowfallPoolContract from "../abi/SnowfallPool.json";
 import SnowfallEthPoolContract from "../abi/SnowfallEthPool.json";
+import AggregatorV3Interface from "../abi/AggregatorV3Interface.json";
 
 const ContractContext = createContext();
 
@@ -21,57 +22,64 @@ export const ContractProvider = ({ children }) => {
   const lpERC20Address = process.env.NEXT_PUBLIC_LP_ERC20;
   const singlePoolAddress = process.env.NEXT_PUBLIC_SC_SINGLE_POOL;
   const lpPoolAddress = process.env.NEXT_PUBLIC_SC_LP_POOL;
+  const ethUsdPriceFeed = process.env.NEXT_PUBLIC_ETH_USD_PRICE_FEED;
   let provider = useProvider();
   let { data: signer } = useSigner();
 
   // init read and write contracts for SNOW
-  let readSnowERC20Contract = useContract({
+  const readSnowERC20Contract = useContract({
     address: snowERC20Address,
     abi: SnowfallERC20Contract.abi,
     signerOrProvider: provider,
   });
-  let writeSnowERC20Contract = useContract({
+  const writeSnowERC20Contract = useContract({
     address: snowERC20Address,
     abi: SnowfallERC20Contract.abi,
     signerOrProvider: signer,
   });
 
   // init read and write contracts for LP token
-  let readLpERC20Contract = useContract({
+  const readLpERC20Contract = useContract({
     address: lpERC20Address,
     abi: IERC20Contract.abi,
     signerOrProvider: provider,
   });
-  let writeLpERC20Contract = useContract({
+  const writeLpERC20Contract = useContract({
     address: lpERC20Address,
     abi: IERC20Contract.abi,
     signerOrProvider: signer,
   });
 
   // init read and write contracts for the Single Pool
-  let readSinglePoolContract = useContract({
+  const readSinglePoolContract = useContract({
     address: singlePoolAddress,
     abi: SnowfallPoolContract.abi,
     signerOrProvider: provider,
   });
 
-  let writeSinglePoolContract = useContract({
+  const writeSinglePoolContract = useContract({
     address: singlePoolAddress,
     abi: SnowfallPoolContract.abi,
     signerOrProvider: signer,
   });
 
   // init read and write contracts for the LP Pool
-  let readLpPoolContract = useContract({
+  const readLpPoolContract = useContract({
     address: lpPoolAddress,
     abi: SnowfallEthPoolContract.abi,
     signerOrProvider: provider,
   });
 
-  let writeLpPoolContract = useContract({
+  const writeLpPoolContract = useContract({
     address: lpPoolAddress,
     abi: SnowfallEthPoolContract.abi,
     signerOrProvider: signer,
+  });
+
+  const ethUsdPriceFeedContract = useContract({
+    address: ethUsdPriceFeed,
+    abi: AggregatorV3Interface.abi,
+    signerOrProvider: provider,
   });
 
   return (
@@ -85,6 +93,7 @@ export const ContractProvider = ({ children }) => {
         writeSinglePoolContract,
         readLpPoolContract,
         writeLpPoolContract,
+        ethUsdPriceFeedContract,
         provider,
         signer,
       }}

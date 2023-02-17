@@ -20,7 +20,6 @@ const Dashboard = () => {
       getSinglePendingRewards();
       getLpPendingRewards();
       subscribeToSyncedEvents();
-      console.log(rewardsData);
     }
     return () => {
       readSinglePoolContract.off("Synced", updatePendingRewards);

@@ -17,6 +17,7 @@
     "@nivo/bar": "^0.80.0",
     "@nivo/core": "^0.80.0",
     "@rainbow-me/rainbowkit": "^0.8.1",
+    "@uniswap/sdk": "^3.0.3",
     "ethers": "^5.7.2",
     "framer-motion": "^9.0.2",
     "next": "13.1.6",
