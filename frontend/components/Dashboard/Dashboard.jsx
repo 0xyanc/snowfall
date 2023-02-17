@@ -1,6 +1,6 @@
 import { useContractProvider } from "@/context/ContractContext";
-import { Flex, Heading, Text } from "@chakra-ui/react";
-// import { ResponsiveBar } from "@nivo/bar";
+import { Divider, Flex, Heading } from "@chakra-ui/react";
+import { ResponsiveBar } from "@nivo/bar";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -20,6 +20,7 @@ const Dashboard = () => {
       getSinglePendingRewards();
       getLpPendingRewards();
       subscribeToSyncedEvents();
+      console.log(rewardsData);
     }
     return () => {
       readSinglePoolContract.off("Synced", updatePendingRewards);
@@ -88,9 +89,32 @@ const Dashboard = () => {
             </Flex>
           )}
         </Flex>
-        {/* <Flex>
-          <ResponsiveBar data={rewardsData} indexBy="date"></ResponsiveBar>
-        </Flex> */}
+        <Divider />
+        <Flex mt="1rem" h="400px" w="90%" direction="column">
+          <Flex justifyContent="center">
+            <Heading as="h3">Staking rewards over time</Heading>
+          </Flex>
+          <ResponsiveBar
+            data={rewardsData}
+            indexBy="date"
+            keys={["amount"]}
+            margin={{ top: 50, right: 50, bottom: 50, left: 60 }}
+            padding={0.2}
+            valueScale={{ type: "linear" }}
+            colors="teal"
+            animate={true}
+            enableLabel={false}
+            gridXValues={[]}
+            axisTop={null}
+            axisRight={null}
+            axisBottom={null}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+            }}
+          />
+        </Flex>
       </Flex>
     </>
   );

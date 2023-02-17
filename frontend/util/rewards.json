@@ -1,0 +1,1050 @@
+[
+    {
+        "date": "20-Feb-2023",
+        "amount": 23889
+    },
+    {
+        "date": "27-Feb-2023",
+        "amount": 24128
+    },
+    {
+        "date": "6-Mar-2023",
+        "amount": 24369
+    },
+    {
+        "date": "13-Mar-2023",
+        "amount": 24613
+    },
+    {
+        "date": "20-Mar-2023",
+        "amount": 24859
+    },
+    {
+        "date": "27-Mar-2023",
+        "amount": 25108
+    },
+    {
+        "date": "3-Apr-2023",
+        "amount": 25359
+    },
+    {
+        "date": "10-Apr-2023",
+        "amount": 25612
+    },
+    {
+        "date": "17-Apr-2023",
+        "amount": 25868
+    },
+    {
+        "date": "24-Apr-2023",
+        "amount": 26127
+    },
+    {
+        "date": "1-May-2023",
+        "amount": 26388
+    },
+    {
+        "date": "8-May-2023",
+        "amount": 26652
+    },
+    {
+        "date": "15-May-2023",
+        "amount": 26919
+    },
+    {
+        "date": "22-May-2023",
+        "amount": 27188
+    },
+    {
+        "date": "29-May-2023",
+        "amount": 27460
+    },
+    {
+        "date": "5-Jun-2023",
+        "amount": 27734
+    },
+    {
+        "date": "12-Jun-2023",
+        "amount": 28012
+    },
+    {
+        "date": "19-Jun-2023",
+        "amount": 28292
+    },
+    {
+        "date": "26-Jun-2023",
+        "amount": 28575
+    },
+    {
+        "date": "3-Jul-2023",
+        "amount": 28861
+    },
+    {
+        "date": "10-Jul-2023",
+        "amount": 29149
+    },
+    {
+        "date": "17-Jul-2023",
+        "amount": 29441
+    },
+    {
+        "date": "24-Jul-2023",
+        "amount": 29735
+    },
+    {
+        "date": "31-Jul-2023",
+        "amount": 30032
+    },
+    {
+        "date": "7-Aug-2023",
+        "amount": 30333
+    },
+    {
+        "date": "14-Aug-2023",
+        "amount": 30636
+    },
+    {
+        "date": "21-Aug-2023",
+        "amount": 30942
+    },
+    {
+        "date": "28-Aug-2023",
+        "amount": 31252
+    },
+    {
+        "date": "4-Sep-2023",
+        "amount": 31564
+    },
+    {
+        "date": "11-Sep-2023",
+        "amount": 31880
+    },
+    {
+        "date": "18-Sep-2023",
+        "amount": 32199
+    },
+    {
+        "date": "25-Sep-2023",
+        "amount": 32521
+    },
+    {
+        "date": "2-Oct-2023",
+        "amount": 32846
+    },
+    {
+        "date": "9-Oct-2023",
+        "amount": 33174
+    },
+    {
+        "date": "16-Oct-2023",
+        "amount": 33506
+    },
+    {
+        "date": "23-Oct-2023",
+        "amount": 33841
+    },
+    {
+        "date": "30-Oct-2023",
+        "amount": 34180
+    },
+    {
+        "date": "6-Nov-2023",
+        "amount": 34521
+    },
+    {
+        "date": "13-Nov-2023",
+        "amount": 34867
+    },
+    {
+        "date": "20-Nov-2023",
+        "amount": 35215
+    },
+    {
+        "date": "27-Nov-2023",
+        "amount": 35567
+    },
+    {
+        "date": "4-Dec-2023",
+        "amount": 35923
+    },
+    {
+        "date": "11-Dec-2023",
+        "amount": 36282
+    },
+    {
+        "date": "18-Dec-2023",
+        "amount": 36645
+    },
+    {
+        "date": "25-Dec-2023",
+        "amount": 37012
+    },
+    {
+        "date": "1-Jan-2024",
+        "amount": 37382
+    },
+    {
+        "date": "8-Jan-2024",
+        "amount": 37756
+    },
+    {
+        "date": "15-Jan-2024",
+        "amount": 38133
+    },
+    {
+        "date": "22-Jan-2024",
+        "amount": 38514
+    },
+    {
+        "date": "29-Jan-2024",
+        "amount": 38900
+    },
+    {
+        "date": "5-Feb-2024",
+        "amount": 39289
+    },
+    {
+        "date": "12-Feb-2024",
+        "amount": 39681
+    },
+    {
+        "date": "19-Feb-2024",
+        "amount": 40078
+    },
+    {
+        "date": "26-Feb-2024",
+        "amount": 40479
+    },
+    {
+        "date": "4-Mar-2024",
+        "amount": 40884
+    },
+    {
+        "date": "11-Mar-2024",
+        "amount": 41293
+    },
+    {
+        "date": "18-Mar-2024",
+        "amount": 41706
+    },
+    {
+        "date": "25-Mar-2024",
+        "amount": 42123
+    },
+    {
+        "date": "1-Apr-2024",
+        "amount": 42544
+    },
+    {
+        "date": "8-Apr-2024",
+        "amount": 42969
+    },
+    {
+        "date": "15-Apr-2024",
+        "amount": 43399
+    },
+    {
+        "date": "22-Apr-2024",
+        "amount": 43833
+    },
+    {
+        "date": "29-Apr-2024",
+        "amount": 44271
+    },
+    {
+        "date": "6-May-2024",
+        "amount": 44714
+    },
+    {
+        "date": "13-May-2024",
+        "amount": 45161
+    },
+    {
+        "date": "20-May-2024",
+        "amount": 45613
+    },
+    {
+        "date": "27-May-2024",
+        "amount": 46069
+    },
+    {
+        "date": "3-Jun-2024",
+        "amount": 46530
+    },
+    {
+        "date": "10-Jun-2024",
+        "amount": 46995
+    },
+    {
+        "date": "17-Jun-2024",
+        "amount": 47465
+    },
+    {
+        "date": "24-Jun-2024",
+        "amount": 47940
+    },
+    {
+        "date": "1-Jul-2024",
+        "amount": 48419
+    },
+    {
+        "date": "8-Jul-2024",
+        "amount": 48903
+    },
+    {
+        "date": "15-Jul-2024",
+        "amount": 49392
+    },
+    {
+        "date": "22-Jul-2024",
+        "amount": 49886
+    },
+    {
+        "date": "29-Jul-2024",
+        "amount": 50385
+    },
+    {
+        "date": "5-Aug-2024",
+        "amount": 50889
+    },
+    {
+        "date": "12-Aug-2024",
+        "amount": 51398
+    },
+    {
+        "date": "19-Aug-2024",
+        "amount": 51912
+    },
+    {
+        "date": "26-Aug-2024",
+        "amount": 52431
+    },
+    {
+        "date": "2-Sep-2024",
+        "amount": 52955
+    },
+    {
+        "date": "9-Sep-2024",
+        "amount": 53485
+    },
+    {
+        "date": "16-Sep-2024",
+        "amount": 54020
+    },
+    {
+        "date": "23-Sep-2024",
+        "amount": 54560
+    },
+    {
+        "date": "30-Sep-2024",
+        "amount": 55105
+    },
+    {
+        "date": "7-Oct-2024",
+        "amount": 55656
+    },
+    {
+        "date": "14-Oct-2024",
+        "amount": 56213
+    },
+    {
+        "date": "21-Oct-2024",
+        "amount": 56775
+    },
+    {
+        "date": "28-Oct-2024",
+        "amount": 57343
+    },
+    {
+        "date": "4-Nov-2024",
+        "amount": 57916
+    },
+    {
+        "date": "11-Nov-2024",
+        "amount": 58495
+    },
+    {
+        "date": "18-Nov-2024",
+        "amount": 59080
+    },
+    {
+        "date": "25-Nov-2024",
+        "amount": 59671
+    },
+    {
+        "date": "2-Dec-2024",
+        "amount": 60268
+    },
+    {
+        "date": "9-Dec-2024",
+        "amount": 60871
+    },
+    {
+        "date": "16-Dec-2024",
+        "amount": 61479
+    },
+    {
+        "date": "23-Dec-2024",
+        "amount": 62094
+    },
+    {
+        "date": "30-Dec-2024",
+        "amount": 62715
+    },
+    {
+        "date": "6-Jan-2025",
+        "amount": 63342
+    },
+    {
+        "date": "13-Jan-2025",
+        "amount": 63976
+    },
+    {
+        "date": "20-Jan-2025",
+        "amount": 64615
+    },
+    {
+        "date": "27-Jan-2025",
+        "amount": 65261
+    },
+    {
+        "date": "3-Feb-2025",
+        "amount": 65914
+    },
+    {
+        "date": "10-Feb-2025",
+        "amount": 66573
+    },
+    {
+        "date": "17-Feb-2025",
+        "amount": 67239
+    },
+    {
+        "date": "24-Feb-2025",
+        "amount": 67911
+    },
+    {
+        "date": "3-Mar-2025",
+        "amount": 68590
+    },
+    {
+        "date": "10-Mar-2025",
+        "amount": 69276
+    },
+    {
+        "date": "17-Mar-2025",
+        "amount": 69969
+    },
+    {
+        "date": "24-Mar-2025",
+        "amount": 70669
+    },
+    {
+        "date": "31-Mar-2025",
+        "amount": 71375
+    },
+    {
+        "date": "7-Apr-2025",
+        "amount": 72089
+    },
+    {
+        "date": "14-Apr-2025",
+        "amount": 72810
+    },
+    {
+        "date": "21-Apr-2025",
+        "amount": 73538
+    },
+    {
+        "date": "28-Apr-2025",
+        "amount": 74274
+    },
+    {
+        "date": "5-May-2025",
+        "amount": 75016
+    },
+    {
+        "date": "12-May-2025",
+        "amount": 75767
+    },
+    {
+        "date": "19-May-2025",
+        "amount": 76524
+    },
+    {
+        "date": "26-May-2025",
+        "amount": 77289
+    },
+    {
+        "date": "2-Jun-2025",
+        "amount": 78062
+    },
+    {
+        "date": "9-Jun-2025",
+        "amount": 78843
+    },
+    {
+        "date": "16-Jun-2025",
+        "amount": 79631
+    },
+    {
+        "date": "23-Jun-2025",
+        "amount": 80428
+    },
+    {
+        "date": "30-Jun-2025",
+        "amount": 81232
+    },
+    {
+        "date": "7-Jul-2025",
+        "amount": 82044
+    },
+    {
+        "date": "14-Jul-2025",
+        "amount": 82865
+    },
+    {
+        "date": "21-Jul-2025",
+        "amount": 83693
+    },
+    {
+        "date": "28-Jul-2025",
+        "amount": 84530
+    },
+    {
+        "date": "4-Aug-2025",
+        "amount": 85376
+    },
+    {
+        "date": "11-Aug-2025",
+        "amount": 86229
+    },
+    {
+        "date": "18-Aug-2025",
+        "amount": 87092
+    },
+    {
+        "date": "25-Aug-2025",
+        "amount": 87963
+    },
+    {
+        "date": "1-Sep-2025",
+        "amount": 88842
+    },
+    {
+        "date": "8-Sep-2025",
+        "amount": 89731
+    },
+    {
+        "date": "15-Sep-2025",
+        "amount": 90628
+    },
+    {
+        "date": "22-Sep-2025",
+        "amount": 91534
+    },
+    {
+        "date": "29-Sep-2025",
+        "amount": 92450
+    },
+    {
+        "date": "6-Oct-2025",
+        "amount": 93374
+    },
+    {
+        "date": "13-Oct-2025",
+        "amount": 94308
+    },
+    {
+        "date": "20-Oct-2025",
+        "amount": 95251
+    },
+    {
+        "date": "27-Oct-2025",
+        "amount": 96203
+    },
+    {
+        "date": "3-Nov-2025",
+        "amount": 97165
+    },
+    {
+        "date": "10-Nov-2025",
+        "amount": 98137
+    },
+    {
+        "date": "17-Nov-2025",
+        "amount": 99118
+    },
+    {
+        "date": "24-Nov-2025",
+        "amount": 100110
+    },
+    {
+        "date": "1-Dec-2025",
+        "amount": 101111
+    },
+    {
+        "date": "8-Dec-2025",
+        "amount": 102122
+    },
+    {
+        "date": "15-Dec-2025",
+        "amount": 103143
+    },
+    {
+        "date": "22-Dec-2025",
+        "amount": 104174
+    },
+    {
+        "date": "29-Dec-2025",
+        "amount": 105216
+    },
+    {
+        "date": "5-Jan-2026",
+        "amount": 106268
+    },
+    {
+        "date": "12-Jan-2026",
+        "amount": 107331
+    },
+    {
+        "date": "19-Jan-2026",
+        "amount": 108404
+    },
+    {
+        "date": "26-Jan-2026",
+        "amount": 109488
+    },
+    {
+        "date": "2-Feb-2026",
+        "amount": 110583
+    },
+    {
+        "date": "9-Feb-2026",
+        "amount": 111689
+    },
+    {
+        "date": "16-Feb-2026",
+        "amount": 112806
+    },
+    {
+        "date": "23-Feb-2026",
+        "amount": 113934
+    },
+    {
+        "date": "2-Mar-2026",
+        "amount": 115073
+    },
+    {
+        "date": "9-Mar-2026",
+        "amount": 116224
+    },
+    {
+        "date": "16-Mar-2026",
+        "amount": 117386
+    },
+    {
+        "date": "23-Mar-2026",
+        "amount": 118560
+    },
+    {
+        "date": "30-Mar-2026",
+        "amount": 119746
+    },
+    {
+        "date": "6-Apr-2026",
+        "amount": 120943
+    },
+    {
+        "date": "13-Apr-2026",
+        "amount": 122153
+    },
+    {
+        "date": "20-Apr-2026",
+        "amount": 123374
+    },
+    {
+        "date": "27-Apr-2026",
+        "amount": 124608
+    },
+    {
+        "date": "4-May-2026",
+        "amount": 125854
+    },
+    {
+        "date": "11-May-2026",
+        "amount": 127113
+    },
+    {
+        "date": "18-May-2026",
+        "amount": 128384
+    },
+    {
+        "date": "25-May-2026",
+        "amount": 129668
+    },
+    {
+        "date": "1-Jun-2026",
+        "amount": 130964
+    },
+    {
+        "date": "8-Jun-2026",
+        "amount": 132274
+    },
+    {
+        "date": "15-Jun-2026",
+        "amount": 133597
+    },
+    {
+        "date": "22-Jun-2026",
+        "amount": 134933
+    },
+    {
+        "date": "29-Jun-2026",
+        "amount": 136282
+    },
+    {
+        "date": "6-Jul-2026",
+        "amount": 137645
+    },
+    {
+        "date": "13-Jul-2026",
+        "amount": 139021
+    },
+    {
+        "date": "20-Jul-2026",
+        "amount": 140411
+    },
+    {
+        "date": "27-Jul-2026",
+        "amount": 141816
+    },
+    {
+        "date": "3-Aug-2026",
+        "amount": 143234
+    },
+    {
+        "date": "10-Aug-2026",
+        "amount": 144666
+    },
+    {
+        "date": "17-Aug-2026",
+        "amount": 146113
+    },
+    {
+        "date": "24-Aug-2026",
+        "amount": 147574
+    },
+    {
+        "date": "31-Aug-2026",
+        "amount": 149050
+    },
+    {
+        "date": "7-Sep-2026",
+        "amount": 150540
+    },
+    {
+        "date": "14-Sep-2026",
+        "amount": 152045
+    },
+    {
+        "date": "21-Sep-2026",
+        "amount": 153566
+    },
+    {
+        "date": "28-Sep-2026",
+        "amount": 155102
+    },
+    {
+        "date": "5-Oct-2026",
+        "amount": 156653
+    },
+    {
+        "date": "12-Oct-2026",
+        "amount": 158219
+    },
+    {
+        "date": "19-Oct-2026",
+        "amount": 159801
+    },
+    {
+        "date": "26-Oct-2026",
+        "amount": 161399
+    },
+    {
+        "date": "2-Nov-2026",
+        "amount": 163013
+    },
+    {
+        "date": "9-Nov-2026",
+        "amount": 164643
+    },
+    {
+        "date": "16-Nov-2026",
+        "amount": 166290
+    },
+    {
+        "date": "23-Nov-2026",
+        "amount": 167953
+    },
+    {
+        "date": "30-Nov-2026",
+        "amount": 169632
+    },
+    {
+        "date": "7-Dec-2026",
+        "amount": 171329
+    },
+    {
+        "date": "14-Dec-2026",
+        "amount": 173042
+    },
+    {
+        "date": "21-Dec-2026",
+        "amount": 174772
+    },
+    {
+        "date": "28-Dec-2026",
+        "amount": 176520
+    },
+    {
+        "date": "4-Jan-2027",
+        "amount": 178285
+    },
+    {
+        "date": "11-Jan-2027",
+        "amount": 180068
+    },
+    {
+        "date": "18-Jan-2027",
+        "amount": 181869
+    },
+    {
+        "date": "25-Jan-2027",
+        "amount": 183687
+    },
+    {
+        "date": "1-Feb-2027",
+        "amount": 185524
+    },
+    {
+        "date": "8-Feb-2027",
+        "amount": 187380
+    },
+    {
+        "date": "15-Feb-2027",
+        "amount": 189253
+    },
+    {
+        "date": "22-Feb-2027",
+        "amount": 191146
+    },
+    {
+        "date": "1-Mar-2027",
+        "amount": 193057
+    },
+    {
+        "date": "8-Mar-2027",
+        "amount": 194988
+    },
+    {
+        "date": "15-Mar-2027",
+        "amount": 196938
+    },
+    {
+        "date": "22-Mar-2027",
+        "amount": 198907
+    },
+    {
+        "date": "29-Mar-2027",
+        "amount": 200896
+    },
+    {
+        "date": "5-Apr-2027",
+        "amount": 202905
+    },
+    {
+        "date": "12-Apr-2027",
+        "amount": 204934
+    },
+    {
+        "date": "19-Apr-2027",
+        "amount": 206984
+    },
+    {
+        "date": "26-Apr-2027",
+        "amount": 209054
+    },
+    {
+        "date": "3-May-2027",
+        "amount": 211144
+    },
+    {
+        "date": "10-May-2027",
+        "amount": 213255
+    },
+    {
+        "date": "17-May-2027",
+        "amount": 215388
+    },
+    {
+        "date": "24-May-2027",
+        "amount": 217542
+    },
+    {
+        "date": "31-May-2027",
+        "amount": 219717
+    },
+    {
+        "date": "7-Jun-2027",
+        "amount": 221915
+    },
+    {
+        "date": "14-Jun-2027",
+        "amount": 224134
+    },
+    {
+        "date": "21-Jun-2027",
+        "amount": 226375
+    },
+    {
+        "date": "28-Jun-2027",
+        "amount": 228639
+    },
+    {
+        "date": "5-Jul-2027",
+        "amount": 230925
+    },
+    {
+        "date": "12-Jul-2027",
+        "amount": 233234
+    },
+    {
+        "date": "19-Jul-2027",
+        "amount": 235567
+    },
+    {
+        "date": "26-Jul-2027",
+        "amount": 237922
+    },
+    {
+        "date": "2-Aug-2027",
+        "amount": 240302
+    },
+    {
+        "date": "9-Aug-2027",
+        "amount": 242705
+    },
+    {
+        "date": "16-Aug-2027",
+        "amount": 245132
+    },
+    {
+        "date": "23-Aug-2027",
+        "amount": 247583
+    },
+    {
+        "date": "30-Aug-2027",
+        "amount": 250059
+    },
+    {
+        "date": "6-Sep-2027",
+        "amount": 252559
+    },
+    {
+        "date": "13-Sep-2027",
+        "amount": 255085
+    },
+    {
+        "date": "20-Sep-2027",
+        "amount": 257636
+    },
+    {
+        "date": "27-Sep-2027",
+        "amount": 260212
+    },
+    {
+        "date": "4-Oct-2027",
+        "amount": 262814
+    },
+    {
+        "date": "11-Oct-2027",
+        "amount": 265442
+    },
+    {
+        "date": "18-Oct-2027",
+        "amount": 268097
+    },
+    {
+        "date": "25-Oct-2027",
+        "amount": 270778
+    },
+    {
+        "date": "1-Nov-2027",
+        "amount": 273486
+    },
+    {
+        "date": "8-Nov-2027",
+        "amount": 276221
+    },
+    {
+        "date": "15-Nov-2027",
+        "amount": 278983
+    },
+    {
+        "date": "22-Nov-2027",
+        "amount": 281773
+    },
+    {
+        "date": "29-Nov-2027",
+        "amount": 284590
+    },
+    {
+        "date": "6-Dec-2027",
+        "amount": 287436
+    },
+    {
+        "date": "13-Dec-2027",
+        "amount": 290311
+    },
+    {
+        "date": "20-Dec-2027",
+        "amount": 293214
+    },
+    {
+        "date": "27-Dec-2027",
+        "amount": 296146
+    },
+    {
+        "date": "3-Jan-2028",
+        "amount": 299107
+    },
+    {
+        "date": "10-Jan-2028",
+        "amount": 302098
+    },
+    {
+        "date": "17-Jan-2028",
+        "amount": 305119
+    },
+    {
+        "date": "24-Jan-2028",
+        "amount": 308170
+    },
+    {
+        "date": "31-Jan-2028",
+        "amount": 311252
+    },
+    {
+        "date": "7-Feb-2028",
+        "amount": 314365
+    },
+    {
+        "date": "14-Feb-2028",
+        "amount": 317508
+    },
+    {
+        "date": "21-Feb-2028",
+        "amount": 320683
+    }
+]
