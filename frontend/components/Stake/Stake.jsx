@@ -24,20 +24,45 @@ import { useAccount } from "wagmi";
 
 const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
   const { address, isConnected } = useAccount();
-  const { writeSinglePoolContract, writeLpPoolContract, readSnowERC20Contract, readLpERC20Contract } =
-    useContractProvider();
+  const {
+    readSinglePoolContract,
+    readLpPoolContract,
+    writeSinglePoolContract,
+    writeLpPoolContract,
+    readSnowERC20Contract,
+    readLpERC20Contract,
+    writeSnowERC20Contract,
+    writeLpERC20Contract,
+  } = useContractProvider();
   const [amountToStake, setAmountToStake] = useState("");
   const [lockValue, setLockValue] = useState(12);
   const [showTooltip, setShowTooltip] = useState(false);
   const [waitTransaction, setWaitTransaction] = useState(false);
   const [balanceOf, setBalanceOf] = useState(0);
+  const [rewardPerSec, setRewardPerSec] = useState(0);
+  const [totalPoolWeightedShares, setTotalPoolWeightedShares] = useState(0);
+  const [apr, setApr] = useState(0);
   const toast = useToast();
 
   useEffect(() => {
     if (isConnected) {
       getBalanceOf();
+      getPoolInfo();
     }
   }, [isConnected, address]);
+
+  const getPoolInfo = async () => {
+    let contract;
+    if (pool === "SNOW") {
+      contract = readSinglePoolContract;
+    } else {
+      contract = readLpPoolContract;
+    }
+    const rewardPerSec = await contract.rewardPerSecond();
+    const totalPoolWeightedShares = await contract.totalPoolWeightedShares();
+    setRewardPerSec(ethers.utils.formatEther(rewardPerSec));
+    setTotalPoolWeightedShares(ethers.utils.formatEther(totalPoolWeightedShares));
+  };
 
   const getBalanceOf = async () => {
     let tokenContract;
@@ -103,6 +128,8 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
       const lockInSeconds = Math.floor((unlockDate - Date.now()) / 1000) + minLockDuration;
       const tx = await contract.stake(amount, lockInSeconds);
       await tx.wait();
+      getPoolInfo();
+      calculateApr(lockValue);
       toast({
         title: "Staked tokens",
         description: "You have successfully staked your tokens",
@@ -121,6 +148,18 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
       });
     } finally {
       setWaitTransaction(false);
+      setAmountToStake("");
+    }
+  };
+
+  const calculateApr = (amount, lockDuration) => {
+    if (totalPoolWeightedShares !== "0.0") {
+      const rewardPerYear = rewardPerSec * 3600 * 24 * 365;
+      // recalculate the weight depending on the lock duration
+      const weight = 1 + (lockDuration / 60) * 5;
+      const rewardPerYearPerShare = rewardPerYear / totalPoolWeightedShares;
+      const calculatedApr = rewardPerYearPerShare * weight * 1e6 * 100;
+      setApr(calculatedApr);
     }
   };
 
@@ -148,22 +187,47 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
                 </Text>
               </Flex>
             </Flex>
-            <Input placeholder={"0 " + pool} value={amountToStake} onChange={(e) => setAmountToStake(e.target.value)} />
-            <Flex mt="1rem" alignItems="center">
-              <Text as="b">Lock duration</Text>
-              <Tooltip label="A longer lock duration gives more weight (from 1 up to 6) for your stake." fontSize="xs">
-                <InfoOutlineIcon ml="1rem" />
-              </Tooltip>
+            <Input
+              placeholder={"0 " + pool}
+              value={amountToStake}
+              onChange={(e) => {
+                setAmountToStake(e.target.value);
+                calculateApr(e.target.value, lockValue);
+              }}
+            />
+            <Flex mt="1rem" alignItems="center" justifyContent="space-between">
+              <Flex>
+                <Text as="b" fontSize="xs">
+                  Lock duration
+                </Text>
+                <Tooltip
+                  label="A longer lock duration gives more weight (from 1 up to 6) for your stake."
+                  fontSize="xs"
+                >
+                  <InfoOutlineIcon ml="0.2rem" />
+                </Tooltip>
+              </Flex>
+              <Flex alignItems="center">
+                <Text fontSize="xs" as="i">
+                  APR: {Number(apr).toFixed(2)}%
+                </Text>
+                <Tooltip label="Estimated APR based on the lock duration" fontSize="xs">
+                  <InfoOutlineIcon ml="0.2rem" />
+                </Tooltip>
+              </Flex>
             </Flex>
             <Slider
-              mt="0rem"
+              mt="0.5rem"
               mb="1rem"
               id="slider"
               defaultValue={12}
               min={0}
               max={60}
               colorScheme="teal"
-              onChange={(lock) => setLockValue(lock)}
+              onChange={(lock) => {
+                setLockValue(lock);
+                calculateApr(amountToStake, lock);
+              }}
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
             >

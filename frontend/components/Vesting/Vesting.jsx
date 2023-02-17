@@ -52,7 +52,7 @@ const Vesting = ({ stake, date }) => {
       <Td>
         {date >= stake.lockedUntil ? (
           <Button
-            colorScheme="blue"
+            colorScheme="teal"
             onClick={() => unstake(stake.stakeId)}
             {...(waitTransaction && { isLoading: true })}
           >

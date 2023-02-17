@@ -193,7 +193,6 @@ export const StakesProvider = ({ children }) => {
     });
     // sort the list by unlock date
     stakeList.sort((a, b) => a.lockedUntil - b.lockedUntil);
-    console.log(stakeList);
     setStakes(stakeList);
   };
 
