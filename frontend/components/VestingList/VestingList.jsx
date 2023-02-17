@@ -1,5 +1,5 @@
 import { useStakesProvider } from "@/context/StakesContext";
-import { Tr, Flex, TableContainer, Table, Thead, Th, Tbody, Heading } from "@chakra-ui/react";
+import { Tr, Flex, TableContainer, Table, Thead, Th, Tbody, Heading, Text } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Vesting from "../Vesting/Vesting";
@@ -14,38 +14,48 @@ const VestingList = () => {
   });
   return (
     <>
-      {isConnected ? (
-        <Flex w="100%" direction="column" alignItems="center" alignContent="center">
+      <Flex direction="column" w="100%">
+        <Flex alignItems="center" direction="column">
           <Heading as="b">Vesting stakes</Heading>
-          <TableContainer mt="1rem">
-            <Table variant="striped" colorScheme="teal">
-              <Thead>
-                <Tr>
-                  <Th>Pool</Th>
-                  <Th isNumeric>Amount</Th>
-                  <Th isNumeric>Weight</Th>
-                  <Th>Lock date</Th>
-                  <Th>Unlock date</Th>
-                  <Th>Action</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {stakes.length !== 0 ? (
-                  stakes.map((stake) => {
-                    return <Vesting stake={stake} date={date} key={stake.id} />;
-                  })
-                ) : (
-                  <></>
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
+          <Text mt="1rem">
+            You will find below your vesting deposits and rewards with all the information related to amounts, unlocks
+            and weights
+          </Text>
         </Flex>
-      ) : (
-        <Flex m="auto">
-          <Heading mt="1rem">Please connect your wallet to start</Heading>
-        </Flex>
-      )}
+        {isConnected ? (
+          <Flex direction="column" alignItems="center" alignContent="center">
+            <TableContainer mt="1rem">
+              <Table variant="striped" colorScheme="teal">
+                <Thead>
+                  <Tr>
+                    <Th>Pool</Th>
+                    <Th isNumeric>Amount</Th>
+                    <Th isNumeric>Weight</Th>
+                    <Th>Lock date</Th>
+                    <Th>Unlock date</Th>
+                    <Th>Action</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {stakes.length !== 0 ? (
+                    stakes.map((stake) => {
+                      return <Vesting stake={stake} date={date} key={stake.id} />;
+                    })
+                  ) : (
+                    <></>
+                  )}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </Flex>
+        ) : (
+          <Flex justifyContent="center">
+            <Heading fontSize="md" mt="5rem">
+              Please connect your wallet to start
+            </Heading>
+          </Flex>
+        )}
+      </Flex>
     </>
   );
 };

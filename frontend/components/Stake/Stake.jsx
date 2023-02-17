@@ -19,21 +19,43 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
-  const { writeSinglePoolContract, writeLpPoolContract } = useContractProvider();
-  const [amountToStake, setAmountToStake] = useState(0);
+  const { address, isConnected } = useAccount();
+  const { writeSinglePoolContract, writeLpPoolContract, readSnowERC20Contract, readLpERC20Contract } =
+    useContractProvider();
+  const [amountToStake, setAmountToStake] = useState("");
   const [lockValue, setLockValue] = useState(12);
   const [showTooltip, setShowTooltip] = useState(false);
   const [waitTransaction, setWaitTransaction] = useState(false);
+  const [balanceOf, setBalanceOf] = useState(0);
   const toast = useToast();
+
+  useEffect(() => {
+    if (isConnected) {
+      getBalanceOf();
+    }
+  }, [isConnected, address]);
+
+  const getBalanceOf = async () => {
+    let tokenContract;
+    if (pool === "SNOW") {
+      tokenContract = readSnowERC20Contract;
+    } else {
+      tokenContract = readLpERC20Contract;
+    }
+    const balanceOf = await tokenContract.balanceOf(address);
+    const formattedBalanceOf = ethers.utils.formatEther(balanceOf);
+    setBalanceOf(formattedBalanceOf);
+  };
 
   const approve = async () => {
     try {
       setWaitTransaction(true);
       let tx;
-      if (pool === "Snowfall") {
+      if (pool === "SNOW") {
         tx = await writeSnowERC20Contract.approve(process.env.NEXT_PUBLIC_SC_SINGLE_POOL, ethers.constants.MaxUint256);
         await tx.wait();
         setSnowAllowance(ethers.constants.MaxUint256);
@@ -67,7 +89,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
     try {
       setWaitTransaction(true);
       let contract;
-      if (pool === "Snowfall") {
+      if (pool === "SNOW") {
         contract = writeSinglePoolContract;
       } else {
         contract = writeLpPoolContract;
@@ -105,18 +127,28 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
   return (
     <Card>
       <CardHeader>
-        <Heading size="md">Stake {pool}</Heading>
+        <Heading size="md">{pool} Pool</Heading>
       </CardHeader>
 
       <CardBody>
         <Box>
           <Flex mt="1rem" direction="column">
-            <Text as="b">Amount to stake</Text>
-            <Input
-              placeholder="Amount to Stake"
-              value={amountToStake}
-              onChange={(e) => setAmountToStake(e.target.value)}
-            />
+            <Flex justifyContent="space-between">
+              <Text as="b" fontSize="xs">
+                Amount
+              </Text>
+              <Flex>
+                <Text as="i" fontSize="xs" onClick={() => setAmountToStake(balanceOf)}>
+                  Balance:{" "}
+                  {Number(balanceOf)
+                    .toFixed(1)
+                    .replace(/[.,]0$/, "") +
+                    " " +
+                    pool}{" "}
+                </Text>
+              </Flex>
+            </Flex>
+            <Input placeholder={"0 " + pool} value={amountToStake} onChange={(e) => setAmountToStake(e.target.value)} />
             <Flex mt="1rem" alignItems="center">
               <Text as="b">Lock duration</Text>
               <Tooltip label="A longer lock duration gives more weight (from 1 up to 6) for your stake." fontSize="xs">
@@ -124,7 +156,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
               </Tooltip>
             </Flex>
             <Slider
-              mt="1rem"
+              mt="0rem"
               mb="1rem"
               id="slider"
               defaultValue={12}

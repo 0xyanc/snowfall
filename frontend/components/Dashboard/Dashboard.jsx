@@ -1,9 +1,11 @@
 import { useContractProvider } from "@/context/ContractContext";
 import { Flex, Heading, Text } from "@chakra-ui/react";
+// import { ResponsiveBar } from "@nivo/bar";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import PendingReward from "../PendingReward/PendingReward";
+import rewardsData from "../../util/rewards.json";
 
 const Dashboard = () => {
   const { address, isConnected } = useAccount();
@@ -79,9 +81,16 @@ const Dashboard = () => {
               <PendingReward pool="LP" pendingRewards={lpPendingRewards} />
             </>
           ) : (
-            <Text mt="1rem">Please connect your wallet to start</Text>
+            <Flex justifyContent="center">
+              <Heading fontSize="md" mt="5rem">
+                Please connect your wallet to start
+              </Heading>
+            </Flex>
           )}
         </Flex>
+        {/* <Flex>
+          <ResponsiveBar data={rewardsData} indexBy="date"></ResponsiveBar>
+        </Flex> */}
       </Flex>
     </>
   );
