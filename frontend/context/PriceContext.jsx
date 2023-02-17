@@ -34,9 +34,7 @@ export const PriceProvider = ({ children }) => {
     const SNOW = new Token(31337, process.env.NEXT_PUBLIC_SNOW_ERC20, 18);
     const WETH = new Token(31337, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 18);
 
-    console.log(uniswap);
     const pair = await Fetcher.fetchPairData(SNOW, WETH);
-    console.log(pair);
     // const route = new Route([pair], WETH[SNOW.chainId]);
     // console.log(route.midPrice.toSignificant(6)); // 201.306
     // console.log(route.midPrice.invert().toSignificant(6)); // 0.00496756

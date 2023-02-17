@@ -46,10 +46,15 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
 
   useEffect(() => {
     if (isConnected) {
-      getBalanceOf();
-      getPoolInfo();
+      updateInfo();
     }
   }, [isConnected, address]);
+
+  const updateInfo = () => {
+    getBalanceOf();
+    getPoolInfo();
+    calculateApr(lockValue);
+  };
 
   const getPoolInfo = async () => {
     let contract;
@@ -128,8 +133,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
       const lockInSeconds = Math.floor((unlockDate - Date.now()) / 1000) + minLockDuration;
       const tx = await contract.stake(amount, lockInSeconds);
       await tx.wait();
-      getPoolInfo();
-      calculateApr(lockValue);
+      updateInfo();
       toast({
         title: "Staked tokens",
         description: "You have successfully staked your tokens",
@@ -152,7 +156,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
     }
   };
 
-  const calculateApr = (amount, lockDuration) => {
+  const calculateApr = (lockDuration) => {
     if (totalPoolWeightedShares !== "0.0") {
       const rewardPerYear = rewardPerSec * 3600 * 24 * 365;
       // recalculate the weight depending on the lock duration
@@ -192,7 +196,6 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
               value={amountToStake}
               onChange={(e) => {
                 setAmountToStake(e.target.value);
-                calculateApr(e.target.value, lockValue);
               }}
             />
             <Flex mt="1rem" alignItems="center" justifyContent="space-between">
@@ -226,7 +229,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
               colorScheme="teal"
               onChange={(lock) => {
                 setLockValue(lock);
-                calculateApr(amountToStake, lock);
+                calculateApr(lock);
               }}
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}

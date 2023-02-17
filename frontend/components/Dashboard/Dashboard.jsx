@@ -1,5 +1,5 @@
 import { useContractProvider } from "@/context/ContractContext";
-import { Divider, Flex, Heading } from "@chakra-ui/react";
+import { Box, Card, CardBody, CardHeader, Divider, Flex, Heading, Text } from "@chakra-ui/react";
 import { ResponsiveBar } from "@nivo/bar";
 import { ethers } from "ethers";
 import { useEffect, useState } from "react";
@@ -14,18 +14,44 @@ const Dashboard = () => {
 
   const [singlePendingRewards, setSinglePendingRewards] = useState(0);
   const [lpPendingRewards, setLpPendingRewards] = useState(0);
+  const [totalClaimedRewards, setTotalClaimedRewards] = useState(0);
 
   useEffect(() => {
     if (isConnected) {
       getSinglePendingRewards();
       getLpPendingRewards();
       subscribeToSyncedEvents();
+      loadClaimedRewardEvents();
     }
     return () => {
       readSinglePoolContract.off("Synced", updatePendingRewards);
       readLpPoolContract.off("Synced", updatePendingRewards);
     };
   }, [address, isConnected]);
+
+  const loadClaimedRewardEvents = async () => {
+    const contractDeployBlock = parseInt(process.env.NEXT_PUBLIC_SC_DEPLOY_BLOCK);
+    const currentBlockNumber = await provider.getBlockNumber();
+    let totalRewards = 0;
+    // retrieve all events by batch of 3000 blocks since SC deployment
+    for (let startBlock = contractDeployBlock; startBlock < currentBlockNumber; startBlock += 3000) {
+      const endBlock = Math.min(currentBlockNumber, startBlock + 2999);
+      const allSinglePoolClaimEvents = await readSinglePoolContract.queryFilter(
+        "ClaimYieldRewards",
+        startBlock,
+        endBlock
+      );
+      const allLpPoolClaimEvents = await readLpPoolContract.queryFilter("ClaimYieldRewards", startBlock, endBlock);
+      allSinglePoolClaimEvents.map((event) => {
+        totalRewards += event.args.value;
+      });
+      allLpPoolClaimEvents.map((event) => {
+        totalRewards += event.args.value;
+      });
+    }
+    // console.log(ethers.utils.formatEther(totalRewards));
+    setTotalClaimedRewards(ethers.utils.formatEther(totalRewards));
+  };
 
   const subscribeToSyncedEvents = async () => {
     const startBlockNumber = await provider.getBlockNumber();
@@ -54,44 +80,46 @@ const Dashboard = () => {
     setLpPendingRewards(formattedPendingRewards);
   };
 
-  const claimBothRewards = async () => {
-    try {
-      const txSingle = await writeSinglePoolContract.claimYieldRewards();
-      const txLp = await writeLpPoolContract.claimYieldRewards();
-      await txSingle.wait();
-      await txLp.wait();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <>
       <Flex direction="column" w="100%" alignItems="center">
         <Heading>Snowfall Staking DApp</Heading>
-        <Flex p="1rem">
-          {isConnected ? (
-            <>
-              {/* <PendingReward
-              heading="Total Pending Rewards"
-              pendingRewards={}
-              claimRewards={claimBothRewards}
-            /> */}
-              <PendingReward pool="Single" pendingRewards={singlePendingRewards} />
-              <PendingReward pool="LP" pendingRewards={lpPendingRewards} />
-            </>
-          ) : (
-            <Flex justifyContent="center">
-              <Heading fontSize="md" mt="5rem">
-                Please connect your wallet to start
-              </Heading>
+
+        {isConnected ? (
+          <>
+            <Flex direction="column">
+              <Flex p="1rem">
+                <PendingReward pool="Single" pendingRewards={singlePendingRewards} />
+                <PendingReward pool="LP" pendingRewards={lpPendingRewards} />
+              </Flex>
+              <Flex justifyContent="center">
+                <Card m="1rem">
+                  <CardHeader>
+                    <Heading size="md">Total Claimed Rewards</Heading>
+                  </CardHeader>
+                  <CardBody>
+                    <Box>
+                      <Text>
+                        You have claimed <Text as="b"> {Number(totalClaimedRewards).toFixed(2)} </Text> SNOW in total.
+                      </Text>
+                    </Box>
+                  </CardBody>
+                </Card>
+              </Flex>
             </Flex>
-          )}
-        </Flex>
+          </>
+        ) : (
+          <Flex justifyContent="center">
+            <Heading fontSize="md" mt="5rem">
+              Please connect your wallet to start
+            </Heading>
+          </Flex>
+        )}
         <Divider />
         <Flex mt="1rem" h="400px" w="90%" direction="column">
-          <Flex justifyContent="center">
+          <Flex alignItems="center" direction="column">
             <Heading as="h3">Staking rewards over time</Heading>
+            <Text mt="0.5rem">Staking rewards increase by 1% every week</Text>
           </Flex>
           <ResponsiveBar
             data={rewardsData}
