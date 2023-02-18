@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.18;
 
-import "./Stake.sol";
+import "./libraries/Stake.sol";
 import "./SnowfallERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -22,9 +22,9 @@ abstract contract CorePool is Ownable {
     /// @dev Data structure representing a user in a pool.
     struct User {
         /// @dev pending yield rewards to be claimed
-        uint128 pendingYield;
+        uint96 pendingYield;
         /// @dev Total weighted shares of the user
-        uint128 totalWeightedShares;
+        uint160 totalWeightedShares;
         /// @dev Checkpoint variable for yield calculation
         uint256 yieldRewardsPerSharePaid;
         /// @dev An array of the user's stakes
@@ -32,39 +32,38 @@ abstract contract CorePool is Ownable {
     }
 
     /// @dev SNOW token address
-    address public snowToken;
+    address internal snowToken;
+    /// @dev Total pool token staked in the pool - Max of 100,000,000 tokens
+    uint96 public totalTokensInPool;
+
     /// @dev SNOW/ETH LP token address
-    address public lpToken;
+    address internal lpToken;
+    /// @dev Timestamp of the last yield distribution event.
+    uint32 private lastYieldDistribution;
+    /// @dev number of SNOW rewarded to stakers per second, increases by 1% every week.
+    uint64 public rewardPerSecond;
+
     /// @dev token that can be staked in the pool
     address public poolToken;
+    /// @dev timestamp of the last reward per second update, used to check when the ratio can be updated.
+    uint32 private lastRewardPerSecUpdate;
+    /// @dev last timestamp for yield farming, after this point no rewards are accruing.
+    uint32 public endTime;
+    /// @dev set to true after successful initialization
+    bool private initialized;
 
-    ///@dev address of the Single Pool - used by the LP Pool for staking the yield rewards
-    address internal singlePoolAddress;
-    /// @dev address of the LP Pool - used by the Single Pool in stakeAsLPPool to verify the sender
-    address internal lpPoolAddress;
-
-    /// @dev Total pool token staked in the pool
-    uint256 public totalTokensInPool;
-    /// @dev Timestamp of the last yield distribution event.
-    uint64 public lastYieldDistribution;
     /// @dev Used to calculate yield rewards (equivalent to rewardIndex)
-    uint256 public yieldRewardsPerShare;
+    uint256 private yieldRewardsPerShare;
 
     /// @dev Total weighted shares in the pool, the sum of the weighted shares of the stakers.
     ///      Used to calculate rewards, keeps track of the tokens weight locked in staking.
     uint256 public totalPoolWeightedShares;
 
-    /// @dev number of SNOW rewarded to stakers per second, increases by 1% every week.
-    uint192 public rewardPerSecond;
+    ///@dev address of the Single Pool - used by the LP Pool for staking the yield rewards
+    address internal singlePoolAddress;
 
-    /// @dev timestamp of the last reward per second update, used to check when the ratio can be updated.
-    uint32 public lastRewardPerSecUpdate;
-
-    /// @dev last timestamp for yield farming, after this point no rewards are accruing.
-    uint32 public endTime;
-
-    /// @dev set to true after successful initialization
-    bool private initialized;
+    /// @dev address of the LP Pool - used by the Single Pool in stakeAsLPPool to verify the sender
+    address internal lpPoolAddress;
 
     /// @dev User storage, maps an address a User.
     mapping(address => User) public users;
@@ -150,7 +149,7 @@ abstract contract CorePool is Ownable {
         // init lastRewardPerSecUpdate
         lastRewardPerSecUpdate = uint32(block.timestamp);
         // init lastYieldDistribution
-        lastYieldDistribution = uint64(block.timestamp);
+        lastYieldDistribution = uint32(block.timestamp);
         // set initialized to true, this function cannot be called anymore
         initialized = true;
     }
@@ -161,7 +160,7 @@ abstract contract CorePool is Ownable {
      * @param _value value of tokens to stake
      * @param _lockDuration stake duration as timestamp
      */
-    function stake(uint256 _value, uint64 _lockDuration) external {
+    function stake(uint96 _value, uint64 _lockDuration) external {
         // validate the inputs
         if (_value == 0) {
             revert CorePool__ValueCannotBeZero();
@@ -188,7 +187,7 @@ abstract contract CorePool is Ownable {
         uint256 stakeWeightedShares = weight * _value;
         // create and save the stake (append it to stakes array)
         Stake.Data memory userStake = Stake.Data({
-            value: uint120(_value),
+            value: uint96(_value),
             lockedFrom: uint64(block.timestamp),
             lockedUntil: lockUntil,
             isYield: false
@@ -196,7 +195,7 @@ abstract contract CorePool is Ownable {
         // pushes new stake to `stakes` array
         user.stakes.push(userStake);
         // update user weight
-        user.totalWeightedShares += uint128(stakeWeightedShares);
+        user.totalWeightedShares += uint160(stakeWeightedShares);
         // update global weight value and global pool token count
         totalPoolWeightedShares += stakeWeightedShares;
         totalTokensInPool += _value;
@@ -238,7 +237,7 @@ abstract contract CorePool is Ownable {
         }
 
         // save values before the stake is deleted
-        (uint120 stakeValue, bool isYield) = (
+        (uint96 stakeValue, bool isYield) = (
             userStake.value,
             userStake.isYield
         );
@@ -250,7 +249,7 @@ abstract contract CorePool is Ownable {
         // deletes stake struct
         delete user.stakes[_stakeId];
         // update user total weighted shares with unstaked amount
-        user.totalWeightedShares = uint128(
+        user.totalWeightedShares = uint160(
             user.totalWeightedShares - stakeWeightedShares
         );
         // update global weight variable with unstaked amount
@@ -367,7 +366,7 @@ abstract contract CorePool is Ownable {
             user.yieldRewardsPerSharePaid
         );
         // increases stored user.pendingYield with value returned
-        user.pendingYield += uint128(pendingYield);
+        user.pendingYield += uint96(pendingYield);
 
         // updates user checkpoint values for future calculations
         user.yieldRewardsPerSharePaid = yieldRewardsPerShare;
@@ -387,7 +386,7 @@ abstract contract CorePool is Ownable {
 
         // if no one has staked yet, update lastYieldDistribution and return
         if (totalPoolWeightedShares == 0) {
-            lastYieldDistribution = uint64(block.timestamp);
+            lastYieldDistribution = uint32(block.timestamp);
             return;
         }
 
@@ -405,7 +404,7 @@ abstract contract CorePool is Ownable {
             totalPoolWeightedShares
         );
         // set the lastYieldDistribution
-        lastYieldDistribution = uint64(block.timestamp);
+        lastYieldDistribution = uint32(block.timestamp);
 
         // emit Synced event
         emit Synced(msg.sender, yieldRewardsPerShare, lastYieldDistribution);

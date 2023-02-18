@@ -19,8 +19,8 @@ contract SnowfallEthPool is CorePool {
         poolToken = _lpToken;
 
         // init the reward per second: 90% of rewards for LP pool - 10% for Single pool
-        rewardPerSecond = uint192(
-            (Stake.INITIAL_TOTAL_REWARD_PER_SECOND * 9) / 10
+        rewardPerSecond = uint64(
+            ((Stake.INITIAL_TOTAL_REWARD_PER_SECOND * 9) / 10)
         );
     }
 
@@ -33,7 +33,7 @@ contract SnowfallEthPool is CorePool {
         // update user state
         _updateReward(msg.sender);
         // check pending yield rewards to claim and save to memory
-        uint256 pendingYieldToClaim = uint256(user.pendingYield);
+        uint96 pendingYieldToClaim = user.pendingYield;
         // if pending yield is zero - just return silently
         if (pendingYieldToClaim == 0) return;
         // clears user pending yield

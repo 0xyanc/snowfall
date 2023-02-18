@@ -10,7 +10,7 @@ pragma solidity 0.8.18;
 library Stake {
     struct Data {
         /// @dev token amount staked
-        uint120 value;
+        uint96 value;
         /// @dev locking period - from
         uint64 lockedFrom;
         /// @dev locking period - until
@@ -38,10 +38,10 @@ library Stake {
     /// @dev Maximum period that someone can lock a stake for - 5 years
     uint256 internal constant MAX_STAKE_PERIOD = 1827 days;
 
-    /// @dev Rewards per weight are stored multiplied by 1e18.
-    uint256 internal constant REWARD_PER_SHARE_MULTIPLIER = 1e18;
+    /// @dev Rewards per share are stored multiplied by 1e12.
+    uint256 internal constant REWARD_PER_SHARE_MULTIPLIER = 1e12;
 
-    /// @dev Claimed yield is always locked for 1 year there weight is 2
+    /// @dev Claimed yield is always locked for 1 year their weight is 2
     uint256 internal constant YIELD_STAKE_WEIGHT_MULTIPLIER = 2 * 1e6;
 
     /// @dev initial reward per second 0.0394990079365079 (scaled by 1e18)
@@ -54,8 +54,8 @@ library Stake {
     /**
      * @dev Stake weighted share is proportional to stake value and time locked.
      *      Time locked goes from 1 month to 5 years
-     *      More time locked means more weight for the stake, weight going from 1 to 5.
-     *      1 year lock => weight of 2 / 5 year lock => weight of 5
+     *      More time locked means more weight for the stake, weight going from 1 to 6.
+     *      1 year lock => weight of 2 // 5 year lock => weight of 6
      * @param _stake data about the stake which is used to calculate its weighted share
      * @return weightShares of the stake
      */

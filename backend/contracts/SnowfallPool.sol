@@ -16,7 +16,7 @@ contract SnowfallPool is CorePool {
         poolToken = _snowToken;
 
         // init the reward per second: 90% of rewards for LP pool - 10% for Single pool
-        rewardPerSecond = uint192(Stake.INITIAL_TOTAL_REWARD_PER_SECOND / 10);
+        rewardPerSecond = uint64(Stake.INITIAL_TOTAL_REWARD_PER_SECOND / 10);
     }
 
     /**
@@ -28,7 +28,7 @@ contract SnowfallPool is CorePool {
         // update user state
         _updateReward(msg.sender);
         // check pending yield rewards to claim and save to memory
-        uint256 pendingYieldToClaim = uint256(user.pendingYield);
+        uint96 pendingYieldToClaim = user.pendingYield;
         // if pending yield is zero - just return silently
         if (pendingYieldToClaim == 0) return;
         // clears user pending yield
@@ -42,7 +42,7 @@ contract SnowfallPool is CorePool {
         uint64 lockUntil = uint64(block.timestamp + Stake.YIELD_STAKE_PERIOD);
         // create new stake and push it into stakes array
         Stake.Data memory newStake = Stake.Data({
-            value: uint120(pendingYieldToClaim),
+            value: pendingYieldToClaim,
             lockedFrom: uint64(block.timestamp),
             lockedUntil: lockUntil,
             isYield: true
@@ -102,7 +102,7 @@ contract SnowfallPool is CorePool {
         uint64 lockUntil = uint64(block.timestamp + Stake.YIELD_STAKE_PERIOD);
         // initialize new yield stake being created in memory
         Stake.Data memory newStake = Stake.Data({
-            value: uint120(_value),
+            value: uint96(_value),
             lockedFrom: uint64(block.timestamp),
             lockedUntil: lockUntil,
             isYield: true
@@ -113,7 +113,7 @@ contract SnowfallPool is CorePool {
         user.stakes.push(newStake);
         // update global weight and global pool token count
         totalPoolWeightedShares += stakeWeight;
-        totalTokensInPool += _value;
+        totalTokensInPool += uint96(_value);
 
         // mint SNOW token to the Single Pool
         SnowfallERC20(snowToken).mint(address(this), _value);

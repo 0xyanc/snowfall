@@ -8,7 +8,6 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         console.log(currentTimeInSeconds)
         await time.increaseTo(currentTimeInSeconds)
     }
-
 }
 
-module.exports.tags = ["all", "current", "main"]
+module.exports.tags = ["timestamp"]
