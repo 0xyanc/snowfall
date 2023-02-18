@@ -21,7 +21,7 @@ describe("Unit tests of Error management for the Staking contracts", function ()
 
     describe("initialize", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
         })
 
@@ -38,7 +38,7 @@ describe("Unit tests of Error management for the Staking contracts", function ()
 
     describe("stake", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
         })
         it("should revert if the amount staked is 0", async function () {
@@ -58,7 +58,7 @@ describe("Unit tests of Error management for the Staking contracts", function ()
 
     describe("pendingRewards", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
         })
         it("should revert if the staker is address 0", async function () {
@@ -73,7 +73,7 @@ describe("Unit tests of Error management for the Staking contracts", function ()
 
     describe("updateRewardPerSecond", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
         })
         it("should revert if the staker is address 0", async function () {
@@ -84,7 +84,7 @@ describe("Unit tests of Error management for the Staking contracts", function ()
 
     describe("stakeFromLPPool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
             lpPool = await ethers.getContract("SnowfallEthPool")
         })

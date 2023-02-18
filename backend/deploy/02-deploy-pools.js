@@ -1,4 +1,3 @@
-const { keccak256, toUtf8Bytes } = require("ethers")
 const { network, ethers } = require("hardhat")
 const { developmentChains, networkConfig } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")

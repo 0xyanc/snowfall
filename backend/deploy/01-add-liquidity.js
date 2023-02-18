@@ -1,6 +1,6 @@
 const { BigNumber } = require("ethers")
 const { network, ethers } = require("hardhat")
-const { developmentChains, networkConfig } = require("../helper-hardhat-config")
+const { networkConfig } = require("../helper-hardhat-config")
 const { verify } = require("../utils/verify")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {

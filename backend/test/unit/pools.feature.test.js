@@ -22,9 +22,9 @@ describe("Unit tests of pool features for the Staking contracts", function () {
         stakerAddress = await staker.getAddress()
     })
 
-    describe("stake", async function () {
+    describe("stake Single Pool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
             snowfallERC20 = await ethers.getContract("SnowfallERC20")
             await snowfallERC20.approve(singlePool.address, ethers.constants.MaxUint256)
@@ -49,18 +49,58 @@ describe("Unit tests of pool features for the Staking contracts", function () {
         })
     })
 
-    describe("updateRewardPerSecond", async function () {
+    describe("stake LP Pool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
+            snowfallERC20 = await ethers.getContract("SnowfallERC20")
+            lpPool = await ethers.getContract("SnowfallEthPool")
+            const chainId = network.config.chainId
+            const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
+            const wethAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)
+            const lpTokenAddress = await IUniswapV2Factory.getPair(snowfallERC20.address, wethAddress)
+            lpTokenERC20 = await ethers.getContractAt("IUniswapV2Pair", lpTokenAddress)
+            await lpTokenERC20.approve(lpPool.address, ethers.constants.MaxUint256)
+        })
+
+        it("should stake 10 tokens for 1 second with weight 1, transfer LP token and emit the event Staked", async function () {
+            const stake = await lpPool.stake(10, 1)
+            await expect(stake).to.changeTokenBalances(lpTokenERC20, [deployer, lpPool], [-10, 10])
+            await expect(stake).to.emit(lpTokenERC20, "Transfer").withArgs(deployerAddress, lpPool.address, 10)
+            await expect(stake).to.emit(lpPool, "Staked")
+        })
+
+        it("should stake 10 tokens for 5 years and update the pool and user stake values", async function () {
+            const fiveYears = 1827 * 24 * 3600
+            await lpPool.stake(10, fiveYears)
+            const user = await lpPool.users(deployerAddress)
+            const totalPoolWeightedShares = await lpPool.totalPoolWeightedShares()
+            const totalTokensInPool = await lpPool.totalTokensInPool()
+            assert.equal(user.totalWeightedShares.toString(), 60000000)
+            assert.equal(totalPoolWeightedShares.toString(), 60000000)
+            assert.equal(totalTokensInPool.toString(), 10)
+        })
+    })
+
+    describe("updateRewardPerSecond Single Pool", async function () {
+        beforeEach(async () => {
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
             snowfallERC20 = await ethers.getContract("SnowfallERC20")
             await snowfallERC20.approve(singlePool.address, ethers.constants.MaxUint256)
             await singlePool.stake(10, 3600)
         })
 
-        it("should revert since a week has not passed yet to update the rewards", async function () {
+        it("should revert since a week has not passed yet to update the rewards per second", async function () {
             // 1 week has not passed yet
             await time.increase(604790)
+            await expect(singlePool.updateRewardPerSecond())
+                .to.be.revertedWithCustomError(singlePool, "CorePool__CannotUpdateRewardRatioYet")
+        })
+
+        it("should revert if staking has ended", async function () {
+            const fiveYearsPlusOneDay = 1828 * 24 * 3600
+            await time.increase(fiveYearsPlusOneDay)
             await expect(singlePool.updateRewardPerSecond())
                 .to.be.revertedWithCustomError(singlePool, "CorePool__CannotUpdateRewardRatioYet")
         })
@@ -77,9 +117,50 @@ describe("Unit tests of pool features for the Staking contracts", function () {
         })
     })
 
-    describe("pendingRewards", async function () {
+    describe("updateRewardPerSecond LP Pool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
+            lpPool = await ethers.getContract("SnowfallEthPool")
+            snowfallERC20 = await ethers.getContract("SnowfallERC20")
+            const chainId = network.config.chainId
+            const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
+            const wethAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)
+            const lpTokenAddress = await IUniswapV2Factory.getPair(snowfallERC20.address, wethAddress)
+            lpTokenERC20 = await ethers.getContractAt("IUniswapV2Pair", lpTokenAddress)
+            await lpTokenERC20.approve(lpPool.address, ethers.constants.MaxUint256)
+            await lpPool.stake(10, 3600)
+        })
+
+        it("should revert since a week has not passed yet to update the rewards", async function () {
+            // 1 week has not passed yet
+            await time.increase(604790)
+            await expect(lpPool.updateRewardPerSecond())
+                .to.be.revertedWithCustomError(lpPool, "CorePool__CannotUpdateRewardRatioYet")
+        })
+
+        it("should revert if staking has ended", async function () {
+            const fiveYearsPlusOneDay = 1828 * 24 * 3600
+            await time.increase(fiveYearsPlusOneDay)
+            await expect(lpPool.updateRewardPerSecond())
+                .to.be.revertedWithCustomError(lpPool, "CorePool__CannotUpdateRewardRatioYet")
+        })
+
+        it("should update the rewards per second value", async function () {
+            // increase time by 1 week
+            await time.increase(604801)
+            const initialRewardPerSec = await lpPool.rewardPerSecond()
+            const update = await lpPool.updateRewardPerSecond()
+            const expectedRewardPerSec = initialRewardPerSec.mul(101).div(100)
+            const updatedRewardPerSecond = await lpPool.rewardPerSecond()
+            assert.equal(updatedRewardPerSecond.toString(), expectedRewardPerSec.toString())
+            await expect(update).to.emit(lpPool, "UpdateRewardPerSecond").withArgs(deployerAddress, expectedRewardPerSec)
+        })
+    })
+
+    describe("pendingRewards Single Pool", async function () {
+        beforeEach(async () => {
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
             snowfallERC20 = await ethers.getContract("SnowfallERC20")
             await snowfallERC20.approve(singlePool.address, ethers.constants.MaxUint256)
@@ -94,11 +175,56 @@ describe("Unit tests of pool features for the Staking contracts", function () {
             const pendingRewards = await singlePool.pendingRewards(deployerAddress)
             assert.equal(pendingRewards.toString(), expectedRewards.toString())
         })
+
+        it("should return an amount of claimable rewards that is less than just rewardPerSec * timePassed, after the end of staking reward", async function () {
+            // initial reward per sec is 39499007936507900 / 10 for single pool
+            const rewardsPerSec = BigNumber.from("3949900793650790");
+            const fiveYears = 1827 * 24 * 3600
+            const expectedRewards = rewardsPerSec.mul(fiveYears)
+            await time.increase(fiveYears)
+            const pendingRewards = await singlePool.pendingRewards(deployerAddress)
+            assert.isBelow(pendingRewards, expectedRewards)
+        })
+    })
+
+    describe("pendingRewards LP Pool", async function () {
+        beforeEach(async () => {
+            await deployments.fixture(["main"])
+            lpPool = await ethers.getContract("SnowfallEthPool")
+            snowfallERC20 = await ethers.getContract("SnowfallERC20")
+            const chainId = network.config.chainId
+            const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
+            const wethAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)
+            const lpTokenAddress = await IUniswapV2Factory.getPair(snowfallERC20.address, wethAddress)
+            lpTokenERC20 = await ethers.getContractAt("IUniswapV2Pair", lpTokenAddress)
+            await lpTokenERC20.approve(lpPool.address, ethers.constants.MaxUint256)
+            await lpPool.stake(10, 1)
+        })
+
+        it("should return the amount of yield claimable by the staker", async function () {
+            // initial reward per sec is 39499007936507900 * 9 / 10 for LP pool
+            const rewardsPerSec = BigNumber.from("39499007936507900").mul(9).div(10);
+            const expectedRewards = rewardsPerSec.mul(10)
+            await time.increase(10)
+            const pendingRewards = await lpPool.pendingRewards(deployerAddress)
+            assert.equal(pendingRewards.toString(), expectedRewards.toString())
+        })
+
+        it("should return an amount of claimable rewards that is less than just rewardPerSec * timePassed, after the end of staking reward", async function () {
+            // initial reward per sec is 39499007936507900 * 9 / 10 for LP pool
+            const rewardsPerSec = BigNumber.from("39499007936507900").mul(9).div(10);
+            const fiveYears = 1827 * 24 * 3600
+            const expectedRewards = rewardsPerSec.mul(fiveYears)
+            await time.increase(fiveYears)
+            const pendingRewards = await lpPool.pendingRewards(deployerAddress)
+            assert.isBelow(pendingRewards, expectedRewards)
+        })
     })
 
     describe("claimYieldRewards Single Pool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
             snowfallERC20 = await ethers.getContract("SnowfallERC20")
             await snowfallERC20.approve(singlePool.address, ethers.constants.MaxUint256)
@@ -146,8 +272,7 @@ describe("Unit tests of pool features for the Staking contracts", function () {
 
     describe("claimYieldRewards LP Pool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
-            singlePool = await ethers.getContract("SnowfallPool")
+            await deployments.fixture(["main"])
             lpPool = await ethers.getContract("SnowfallEthPool")
             snowfallERC20 = await ethers.getContract("SnowfallERC20")
             const chainId = network.config.chainId
@@ -210,9 +335,9 @@ describe("Unit tests of pool features for the Staking contracts", function () {
         })
     })
 
-    describe("unstake", async function () {
+    describe("unstake Single Pool", async function () {
         beforeEach(async () => {
-            await deployments.fixture(["all"])
+            await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")
             snowfallERC20 = await ethers.getContract("SnowfallERC20")
             await snowfallERC20.approve(singlePool.address, ethers.constants.MaxUint256)
@@ -259,6 +384,47 @@ describe("Unit tests of pool features for the Staking contracts", function () {
             await expect(unstake).to.changeTokenBalances(snowfallERC20, [singlePool, deployer], [expectedRewards.mul(-1), expectedRewards])
             await expect(unstake).to.emit(snowfallERC20, "Transfer").withArgs(singlePool.address, deployerAddress, expectedRewards)
             await expect(unstake).to.emit(singlePool, "Unstake").withArgs(deployerAddress, 1)
+        })
+    })
+
+    describe("unstake LP Pool", async function () {
+        beforeEach(async () => {
+            await deployments.fixture(["main"])
+            lpPool = await ethers.getContract("SnowfallEthPool")
+            snowfallERC20 = await ethers.getContract("SnowfallERC20")
+            const chainId = network.config.chainId
+            const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
+            const wethAddress = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+            const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)
+            const lpTokenAddress = await IUniswapV2Factory.getPair(snowfallERC20.address, wethAddress)
+            lpTokenERC20 = await ethers.getContractAt("IUniswapV2Pair", lpTokenAddress)
+            await lpTokenERC20.approve(lpPool.address, ethers.constants.MaxUint256)
+            await lpPool.stake(10, 10)
+        })
+
+        it("should revert since the stake is not unlocked yet", async function () {
+            await expect(lpPool.unstake(0))
+                .to.be.revertedWithCustomError(lpPool, "CorePool__NotUnlockedYet")
+        })
+
+        it("should unstake the first stake (10 tokens), emit the event Unstake and transfer the token back", async function () {
+            await time.increase(11)
+            const unstake = await lpPool.unstake(0)
+
+            await expect(unstake).to.changeTokenBalances(lpTokenERC20, [lpPool, deployer], [-10, 10])
+            await expect(unstake).to.emit(lpTokenERC20, "Transfer").withArgs(lpPool.address, deployerAddress, 10)
+            await expect(unstake).to.emit(lpPool, "Unstake").withArgs(deployerAddress, 0)
+        })
+
+        it("should unstake the first stake (10 tokens) and update the pool and user info", async function () {
+            await time.increase(11)
+            await lpPool.unstake(0)
+            const user = await lpPool.users(deployerAddress)
+            const totalPoolWeightedShares = await lpPool.totalPoolWeightedShares()
+            const totalTokensInPool = await lpPool.totalTokensInPool()
+            assert.equal(user.totalWeightedShares, 0)
+            assert.equal(totalPoolWeightedShares, 0)
+            assert.equal(totalTokensInPool, 0)
         })
     })
 })
