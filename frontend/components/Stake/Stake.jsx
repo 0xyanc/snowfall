@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardBody,
-  CardHeader,
   Flex,
   Heading,
   Input,
@@ -89,7 +88,6 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
     const totalPoolTokens = ethers.utils.formatEther(await contract.totalTokensInPool());
     const tvl = totalPoolTokens * tokenPrice;
     setTotalValueLocked(tvl);
-    console.log(new Intl.NumberFormat("en-us", { style: "currency", currency: "USD" }).format(tvl));
     setTotalPoolWeightedShares(Number(ethers.utils.formatEther(totalPoolWeightedShares)));
     setRewardPerSec(Number(ethers.utils.formatEther(rewardPerSec)));
     calculateApr(lockValue);
@@ -187,17 +185,21 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
     const rewardPerYear = rewardPerSecRef.current * 3600 * 24 * 365;
     // recalculate the weight depending on the lock duration
     const weight = 1 + (lockDuration / 60) * 5;
-    const rewardPerYearPerShare = rewardPerYear / totalPoolWeightedSharesRef.current;
-    const calculatedApr = rewardPerYearPerShare * weight * 1e6 * 100;
+    const rewardPerYearPerShare = (rewardPerYear * 1e6) / totalPoolWeightedSharesRef.current;
+    let calculatedApr;
+    if (pool === "Single") {
+      calculatedApr = rewardPerYearPerShare * weight * 100;
+    } else {
+      // for LP pool calculate APR based on USD amount
+      // get the reward per year per share, each share is equivalent of the SNOW/ETH LP token price (at weight 1)
+      const rewardPerYearPerShareInUsd = rewardPerYearPerShare * snowEthPrice * ethUsdPrice;
+      calculatedApr = (rewardPerYearPerShareInUsd / lpTokenPrice) * weight * 100;
+    }
     setApr(calculatedApr);
   };
 
   return (
     <Card w="25%">
-      {/* <CardHeader>
-        <Heading size="sm">{pool} Pool</Heading>
-      </CardHeader> */}
-
       <CardBody>
         <Box>
           <Flex alignItems="center" justifyContent="space-between">
@@ -249,7 +251,10 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
                 <Text fontSize="xs" as="i">
                   APR: {Number(apr).toFixed(2)}%
                 </Text>
-                <Tooltip label="Estimated APR based on the lock duration" fontSize="xs">
+                <Tooltip
+                  label="Estimated APR based on the lock duration and the current week reward rate"
+                  fontSize="xs"
+                >
                   <InfoOutlineIcon ml="0.2rem" />
                 </Tooltip>
               </Flex>
