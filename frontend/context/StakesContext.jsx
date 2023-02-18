@@ -2,7 +2,6 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 import { useContractProvider } from "./ContractContext";
 import { ethers } from "ethers";
-import { WEIGHT_MULTIPLIER } from "@/util/Constants";
 
 const StakesContext = createContext();
 

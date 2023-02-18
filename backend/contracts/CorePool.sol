@@ -225,7 +225,7 @@ abstract contract CorePool is Ownable {
      *      previously minted at claim time.
      *      Otherwise transfer SNOW or LP from the contract balance.
      *
-     * @param _stakeId stake ID to unstake from, zero-indexed
+     * @param _stakeId stake ID to unstake
      */
     function unstake(uint256 _stakeId) external {
         // get a pointer to user data struct
@@ -247,14 +247,14 @@ abstract contract CorePool is Ownable {
         // store weighted shares of this stake
         uint256 stakeWeightedShares = Stake.weightedShares(userStake);
 
-        // deletes stake struct, no need to save new weight because it stays 0
+        // deletes stake struct
         delete user.stakes[_stakeId];
         // update user total weighted shares with unstaked amount
         user.totalWeightedShares = uint128(
             user.totalWeightedShares - stakeWeightedShares
         );
         // update global weight variable with unstaked amount
-        totalPoolWeightedShares = totalPoolWeightedShares - stakeWeightedShares;
+        totalPoolWeightedShares -= stakeWeightedShares;
         // update global pool token count
         totalTokensInPool -= stakeValue;
 
@@ -326,7 +326,7 @@ abstract contract CorePool is Ownable {
      * @notice Increase reward/second by 1%, can be executed no more than once per week
      *
      * @dev in case there is not enough interactions with the contract,
-     *      this function is called every week by a script to ensure that the ratio is updated
+     *      this function is called every week by a ChainLink Upkeep to ensure that the ratio is updated
      */
     function updateRewardPerSecond() public {
         // checks if ratio can be updated i.e. if seconds/update have passed

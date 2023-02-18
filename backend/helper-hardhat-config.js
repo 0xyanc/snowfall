@@ -11,7 +11,7 @@ const networkConfig = {
     }
 }
 const DECIMALS = "18"
-const INITIAL_PRICE = "170000000000000000000"
+const INITIAL_PRICE = "1700000000000000000000"
 const developmentChains = ["hardhat", "localhost"]
 
 module.exports = {

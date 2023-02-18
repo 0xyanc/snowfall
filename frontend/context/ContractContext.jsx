@@ -5,6 +5,8 @@ import IERC20Contract from "../abi/IERC20.json";
 import SnowfallPoolContract from "../abi/SnowfallPool.json";
 import SnowfallEthPoolContract from "../abi/SnowfallEthPool.json";
 import AggregatorV3Interface from "../abi/AggregatorV3Interface.json";
+import IUniswapV2Router02 from "../abi/IUniswapV2Router02.json";
+import IUniswapV2Pair from "../abi/IUniswapV2Pair.json";
 
 const ContractContext = createContext();
 
@@ -22,7 +24,8 @@ export const ContractProvider = ({ children }) => {
   const lpERC20Address = process.env.NEXT_PUBLIC_LP_ERC20;
   const singlePoolAddress = process.env.NEXT_PUBLIC_SC_SINGLE_POOL;
   const lpPoolAddress = process.env.NEXT_PUBLIC_SC_LP_POOL;
-  const ethUsdPriceFeed = process.env.NEXT_PUBLIC_ETH_USD_PRICE_FEED;
+  const ethUsdPriceFeedAddress = process.env.NEXT_PUBLIC_ETH_USD_PRICE_FEED;
+  const uniswapV2RouterAddress = process.env.NEXT_PUBLIC_SC_UNISWAP_V2_ROUTER;
   let provider = useProvider();
   let { data: signer } = useSigner();
 
@@ -77,8 +80,20 @@ export const ContractProvider = ({ children }) => {
   });
 
   const ethUsdPriceFeedContract = useContract({
-    address: ethUsdPriceFeed,
+    address: ethUsdPriceFeedAddress,
     abi: AggregatorV3Interface.abi,
+    signerOrProvider: provider,
+  });
+
+  const uniswapV2RouterContract = useContract({
+    address: uniswapV2RouterAddress,
+    abi: IUniswapV2Router02.abi,
+    signerOrProvider: provider,
+  });
+
+  const uniswapV2PairContract = useContract({
+    address: lpERC20Address,
+    abi: IUniswapV2Pair.abi,
     signerOrProvider: provider,
   });
 
@@ -94,6 +109,8 @@ export const ContractProvider = ({ children }) => {
         readLpPoolContract,
         writeLpPoolContract,
         ethUsdPriceFeedContract,
+        uniswapV2RouterContract,
+        uniswapV2PairContract,
         provider,
         signer,
       }}

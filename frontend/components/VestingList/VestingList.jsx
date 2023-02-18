@@ -12,6 +12,8 @@ const VestingList = () => {
     var timer = setInterval(() => setDate(new Date()), 15000);
     return () => clearInterval(timer);
   });
+  const [isSingleChecked, setIsSingleChecked] = useState(false);
+  const [isLpChecked, setIsLpChecked] = useState(false);
   return (
     <>
       <Flex direction="column" w="100%">

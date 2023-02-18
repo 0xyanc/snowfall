@@ -1,4 +1,5 @@
 import { useContractProvider } from "@/context/ContractContext";
+import { usePriceProvider } from "@/context/PriceContext";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import {
   Box,
@@ -19,7 +20,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { ethers } from "ethers";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAccount } from "wagmi";
 
 const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
@@ -34,13 +35,31 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
     writeSnowERC20Contract,
     writeLpERC20Contract,
   } = useContractProvider();
+  const { ethUsdPrice, snowEthPrice, lpTokenPrice } = usePriceProvider();
+
   const [amountToStake, setAmountToStake] = useState("");
   const [lockValue, setLockValue] = useState(12);
   const [showTooltip, setShowTooltip] = useState(false);
   const [waitTransaction, setWaitTransaction] = useState(false);
   const [balanceOf, setBalanceOf] = useState(0);
-  const [rewardPerSec, setRewardPerSec] = useState(0);
-  const [totalPoolWeightedShares, setTotalPoolWeightedShares] = useState(0);
+  const [rewardPerSec, _setRewardPerSec] = useState(0);
+  const rewardPerSecRef = useRef(rewardPerSec);
+  const setRewardPerSec = (data) => {
+    rewardPerSecRef.current = data;
+    _setRewardPerSec(data);
+  };
+  const [totalPoolWeightedShares, _setTotalPoolWeightedShares] = useState(0);
+  const totalPoolWeightedSharesRef = useRef(totalPoolWeightedShares);
+  const setTotalPoolWeightedShares = (data) => {
+    totalPoolWeightedSharesRef.current = data;
+    _setTotalPoolWeightedShares(data);
+  };
+  const [totalValueLocked, _setTotalValueLocked] = useState(0);
+  const totalValueLockedRef = useRef(totalValueLocked);
+  const setTotalValueLocked = (data) => {
+    totalValueLockedRef.current = data;
+    _setTotalValueLocked(data);
+  };
   const [apr, setApr] = useState(0);
   const toast = useToast();
 
@@ -53,20 +72,27 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
   const updateInfo = () => {
     getBalanceOf();
     getPoolInfo();
-    calculateApr(lockValue);
   };
 
   const getPoolInfo = async () => {
     let contract;
+    let tokenPrice;
     if (pool === "SNOW") {
       contract = readSinglePoolContract;
+      tokenPrice = snowEthPrice * ethUsdPrice;
     } else {
       contract = readLpPoolContract;
+      tokenPrice = lpTokenPrice;
     }
     const rewardPerSec = await contract.rewardPerSecond();
     const totalPoolWeightedShares = await contract.totalPoolWeightedShares();
-    setRewardPerSec(ethers.utils.formatEther(rewardPerSec));
-    setTotalPoolWeightedShares(ethers.utils.formatEther(totalPoolWeightedShares));
+    const totalPoolTokens = ethers.utils.formatEther(await contract.totalTokensInPool());
+    const tvl = totalPoolTokens * tokenPrice;
+    setTotalValueLocked(tvl);
+    console.log(new Intl.NumberFormat("en-us", { style: "currency", currency: "USD" }).format(tvl));
+    setTotalPoolWeightedShares(Number(ethers.utils.formatEther(totalPoolWeightedShares)));
+    setRewardPerSec(Number(ethers.utils.formatEther(rewardPerSec)));
+    calculateApr(lockValue);
   };
 
   const getBalanceOf = async () => {
@@ -134,6 +160,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
       const tx = await contract.stake(amount, lockInSeconds);
       await tx.wait();
       updateInfo();
+      calculateApr(lockValue);
       toast({
         title: "Staked tokens",
         description: "You have successfully staked your tokens",
@@ -157,26 +184,34 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
   };
 
   const calculateApr = (lockDuration) => {
-    if (totalPoolWeightedShares !== "0.0") {
-      const rewardPerYear = rewardPerSec * 3600 * 24 * 365;
-      // recalculate the weight depending on the lock duration
-      const weight = 1 + (lockDuration / 60) * 5;
-      const rewardPerYearPerShare = rewardPerYear / totalPoolWeightedShares;
-      const calculatedApr = rewardPerYearPerShare * weight * 1e6 * 100;
-      setApr(calculatedApr);
-    }
+    const rewardPerYear = rewardPerSecRef.current * 3600 * 24 * 365;
+    // recalculate the weight depending on the lock duration
+    const weight = 1 + (lockDuration / 60) * 5;
+    const rewardPerYearPerShare = rewardPerYear / totalPoolWeightedSharesRef.current;
+    const calculatedApr = rewardPerYearPerShare * weight * 1e6 * 100;
+    setApr(calculatedApr);
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <Heading size="md">{pool} Pool</Heading>
-      </CardHeader>
+    <Card w="25%">
+      {/* <CardHeader>
+        <Heading size="sm">{pool} Pool</Heading>
+      </CardHeader> */}
 
       <CardBody>
         <Box>
+          <Flex alignItems="center" justifyContent="space-between">
+            <Heading size="md">{pool} Pool</Heading>
+            <Text fontSize="sm">
+              <Text as="i">TVL:</Text>
+              {" " +
+                new Intl.NumberFormat("en-us", { style: "currency", currency: "USD" }).format(
+                  totalValueLockedRef.current
+                )}
+            </Text>
+          </Flex>
           <Flex mt="1rem" direction="column">
-            <Flex justifyContent="space-between">
+            <Flex justifyContent="space-between" mt="1rem">
               <Text as="b" fontSize="xs">
                 Amount
               </Text>

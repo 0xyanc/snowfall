@@ -18,7 +18,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     const wethAddress = await IUniswapV2Router02.WETH()
     log(`WETH address ${wethAddress}`)
     const oneEth = ethers.utils.parseUnits("1", "ether")
-    const oneThousandEth = ethers.utils.parseUnits("1000", "ether")
+    const oneThousandEth = ethers.utils.parseUnits("10000", "ether")
 
     log("--------------------------------------")
     // approve snow to uniswap router

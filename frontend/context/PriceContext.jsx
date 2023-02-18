@@ -1,7 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { ethers } from "ethers";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useContractProvider } from "./ContractContext";
-import { ChainId, Fetcher, Route, Token } from "@uniswap/sdk";
-import * as uniswap from "@uniswap/sdk";
 
 const PriceContext = createContext();
 
@@ -15,30 +14,59 @@ export function usePriceProvider() {
 }
 
 export const PriceProvider = ({ children }) => {
-  // ETH/USD="0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e"
-  const { ethUsdPriceFeedContract } = useContractProvider();
-  const [ethUsdPrice, setEthUsdPrice] = useState(0);
-  const [snowEthPrice, setSnowEthPrice] = useState(0);
+  const { ethUsdPriceFeedContract, uniswapV2RouterContract, uniswapV2PairContract, readLpERC20Contract } =
+    useContractProvider();
+  const [ethUsdPrice, _setEthUsdPrice] = useState(0);
+  const ethUsdPriceRef = useRef(ethUsdPrice);
+  const setEthUsdPrice = (data) => {
+    ethUsdPriceRef.current = data;
+    _setEthUsdPrice(data);
+  };
+  const [snowEthPrice, _setSnowEthPrice] = useState(0);
+  const snowEthPriceRef = useRef(snowEthPrice);
+  const setSnowEthPrice = (data) => {
+    snowEthPriceRef.current = data;
+    _setSnowEthPrice(data);
+  };
+  const [lpTokenPrice, setLpTokenPrice] = useState(0);
 
   useEffect(() => {
     getEthUsdPrice();
-    //getSnowEthPrice();
+    getSnowEthPrice();
+    getLpTokenPriceInUsd();
   }, []);
+
+  const getLpTokenPriceInUsd = async () => {
+    const [reserve0, reserve1] = await uniswapV2PairContract.getReserves();
+    const reserveSnow = Number(ethers.utils.formatEther(reserve0));
+    const reserveEth = Number(ethers.utils.formatEther(reserve1));
+    const totalSupply = Number(ethers.utils.formatEther(await readLpERC20Contract.totalSupply()));
+    const totalValueInLP = (reserveSnow * snowEthPriceRef.current + reserveEth) * ethUsdPriceRef.current;
+    const lpTokenValue = totalValueInLP / totalSupply;
+    setLpTokenPrice(lpTokenValue);
+  };
 
   const getEthUsdPrice = async () => {
     const roundData = await ethUsdPriceFeedContract.latestRoundData();
-    setEthUsdPrice(roundData.answer.toString());
+    const ethUsdPrice = ethers.utils.formatEther(roundData.answer);
+    setEthUsdPrice(ethUsdPrice);
   };
 
   const getSnowEthPrice = async () => {
-    const SNOW = new Token(31337, process.env.NEXT_PUBLIC_SNOW_ERC20, 18);
-    const WETH = new Token(31337, "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", 18);
+    // approximation of the price from UniswapV2Router where all the liquidity is
+    const SNOW_ADDRESS = process.env.NEXT_PUBLIC_SNOW_ERC20;
+    const WETH_ADDRESS = process.env.NEXT_PUBLIC_WETH_ERC20;
+    // check how much SNOW we get from 1 ETH
+    let amountEthFromContract = await uniswapV2RouterContract.getAmountsOut(
+      1, // 1 ETH
+      [WETH_ADDRESS, SNOW_ADDRESS]
+    );
 
-    const pair = await Fetcher.fetchPairData(SNOW, WETH);
-    // const route = new Route([pair], WETH[SNOW.chainId]);
-    // console.log(route.midPrice.toSignificant(6)); // 201.306
-    // console.log(route.midPrice.invert().toSignificant(6)); // 0.00496756
+    // add the 0.3% fee back
+    const oneEthInSnow = amountEthFromContract[1].toString() / 0.997;
+    const priceSnowEth = 1 / oneEthInSnow;
+    setSnowEthPrice(priceSnowEth);
   };
 
-  return <PriceContext.Provider value={{ ethUsdPrice }}>{children}</PriceContext.Provider>;
+  return <PriceContext.Provider value={{ ethUsdPrice, snowEthPrice, lpTokenPrice }}>{children}</PriceContext.Provider>;
 };
