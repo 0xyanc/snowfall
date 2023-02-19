@@ -338,7 +338,7 @@ describe("Unit tests of pool features for the Staking contracts", function () {
         })
     })
 
-    describe.only("claimYieldRewards LP Pool 2 users", async function () {
+    describe("claimYieldRewards LP Pool 2 users", async function () {
         beforeEach(async () => {
             await deployments.fixture(["main"])
             singlePool = await ethers.getContract("SnowfallPool")

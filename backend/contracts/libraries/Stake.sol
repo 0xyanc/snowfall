@@ -53,7 +53,7 @@ library Stake {
 
     /**
      * @dev Stake weighted share is proportional to stake value and time locked.
-     *      Time locked goes from 1 month to 5 years
+     *      Time locked goes from 1 second to 5 years
      *      More time locked means more weight for the stake, weight going from 1 to 6.
      *      1 year lock => weight of 2 // 5 year lock => weight of 6
      * @param _stake data about the stake which is used to calculate its weighted share
