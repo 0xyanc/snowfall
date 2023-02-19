@@ -2,20 +2,16 @@ const { network, ethers } = require("hardhat")
 const { networkConfig } = require("../helper-hardhat-config")
 
 module.exports = async ({ getNamedAccounts, deployments }) => {
-    const { deploy, log } = deployments
+    const { log } = deployments
     const { deployer, staker } = await getNamedAccounts()
-    console.log(staker)
     const chainId = network.config.chainId
-    // If we are on a local development network, advance to the current timestamp
+    // If we are on a local development network, transfer tokens to accounts[1] for additional testing
     if (chainId == 31337) {
         const snowERC20 = await deployments.get("SnowfallERC20")
         const snowERC20Address = snowERC20.address
         const snowERC20Contract = await ethers.getContractAt("SnowfallERC20", snowERC20Address)
-        const uniswapRouterAddress = networkConfig[chainId].UniswapV2Router02
-        const IUniswapV2Router02 = await ethers.getContractAt("IUniswapV2Router02", uniswapRouterAddress, deployer)
-        const wethAddress = await IUniswapV2Router02.WETH()
+        const wethAddress = networkConfig[chainId].WETH
 
-        log("*** Retrieve SNOW/ETH LP Token address ***")
         //retrieve lp token address 
         const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
         const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)

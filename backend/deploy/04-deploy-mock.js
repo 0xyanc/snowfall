@@ -8,14 +8,14 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     // If we are on a local development network, we need to deploy mocks!
     if (chainId == 31337) {
+        log('---------------------------------')
         log("Local Network ! Deploying Mocks !")
-        const mock = await deploy("MockV3Aggregator", {
+        await deploy("MockV3Aggregator", {
             from: deployer,
             log: true,
             args: [DECIMALS, INITIAL_PRICE],
         })
-        log(`Mock deployed at ${mock.address}`)
         log('---------------------------------')
     }
 }
-module.exports.tags = ["all", "mocks", "main"]
+module.exports.tags = ["all", "mocks"]

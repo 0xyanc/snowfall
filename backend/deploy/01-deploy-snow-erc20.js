@@ -8,6 +8,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     log("--------------------------------------")
     log("*** Deploying SnowfallERC20 ***")
+    // initial supply of 70,000,000 - 30,000,000 dedicated to yield farming
     const initialSupply = ethers.utils.parseUnits("70000000", "ether")
     let args = [initialSupply]
 
@@ -17,11 +18,11 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         log: true,
         waitConfirmations: network.config.blockConfirmations || 1
     })
-    log(`*** SnowfallERC20 deployed ${snowERC20.address} ***`)
     //Verify the smart contract 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN) {
-        log("Verifying...")
+        log("Verifying SnowfallERC20 contract...")
         await verify(snowERC20.address, args)
+        log("SnowfallERC20 contract verified")
     }
 }
 
