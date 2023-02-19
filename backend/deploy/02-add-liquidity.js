@@ -18,10 +18,13 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
 
     log("--------------------------------------")
     // approve snow to uniswap router
-    await snowERC20Contract.approve(uniswapRouterAddress, oneThousandEth)
+    log("*** Approving SNOW before adding liquidity ***")
+    const approve = await snowERC20Contract.approve(uniswapRouterAddress, oneThousandEth)
+    await approve.wait()
     // add snow and ETH liquidity
     log("*** Adding SNOW/ETH liquidity to UniswapV2 ***")
-    await IUniswapV2Router02.addLiquidityETH(snowERC20Address, oneThousandEth, oneThousandEth, oneEth, deployer, Date.now(), { value: oneEth })
+    const addLiq = await IUniswapV2Router02.addLiquidityETH(snowERC20Address, oneThousandEth, oneThousandEth, oneEth, deployer, Date.now(), { value: oneEth })
+    await addLiq.wait()
 
 }
 

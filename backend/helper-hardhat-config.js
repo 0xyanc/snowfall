@@ -13,8 +13,8 @@ const networkConfig = {
         WETH: "0xb4fbf271143f4fbf7b91a5ded31805e42b2208d6"
     }
 }
-const DECIMALS = "18"
-const INITIAL_PRICE = "1700000000000000000000"
+const DECIMALS = "8"
+const INITIAL_PRICE = "170000000000"
 const developmentChains = ["hardhat", "localhost"]
 
 module.exports = {

@@ -16,7 +16,7 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     //retrieve lp token address 
     const uniswapFactoryAddress = networkConfig[chainId].UniswapV2Factory
     const IUniswapV2Factory = await ethers.getContractAt("IUniswapV2Factory", uniswapFactoryAddress, deployer)
-    const lpTokenAddress = await IUniswapV2Factory.getPair(snowERC20Address, wethAddress)
+    const lpTokenAddress = await IUniswapV2Factory.getPair(snowERC20.address, wethAddress)
     log(`*** LP Token address: ${lpTokenAddress} ***`)
 
     log("--------------------------------------")
@@ -37,14 +37,17 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
     })
     log("--------------------------------------")
     log("*** Granting MINTER_ROLE to Single Pool ***")
-    snowERC20Contract.grantRole("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6", singlePool.address)
+    const grantRole = await snowERC20Contract.grantRole("0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6", singlePool.address)
+    await grantRole.wait()
 
 
     log("*** Initializing the pools ***")
     const singlePoolContract = await ethers.getContractAt("SnowfallPool", singlePool.address)
     const lpPoolContract = await ethers.getContractAt("SnowfallEthPool", lpPool.address)
-    singlePoolContract.initialize(singlePool.address, lpPool.address)
-    lpPoolContract.initialize(singlePool.address, lpPool.address)
+    const initSingle = await singlePoolContract.initialize(singlePool.address, lpPool.address)
+    await initSingle.wait()
+    const initLP = await lpPoolContract.initialize(singlePool.address, lpPool.address)
+    await initLP.wait()
 
     //Verify the smart contract 
     if (!developmentChains.includes(network.name) && process.env.ETHERSCAN) {

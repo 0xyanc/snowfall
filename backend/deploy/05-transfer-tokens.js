@@ -19,9 +19,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
         const lpTokenERC20 = await ethers.getContractAt("IUniswapV2Pair", lpTokenAddress)
 
         // transfer SNOW tokens to staker address
-        snowERC20Contract.transfer(staker, ethers.utils.parseUnits("1000000", "ether"))
+        await snowERC20Contract.transfer(staker, ethers.utils.parseUnits("1000000", "ether"))
         // transfer SNOW/ETH LP tokens to staker address
-        lpTokenERC20.transfer(staker, ethers.utils.parseUnits("10", "ether"))
+        await lpTokenERC20.transfer(staker, ethers.utils.parseUnits("10", "ether"))
     }
 }
 
