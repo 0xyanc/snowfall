@@ -37,6 +37,7 @@ export const StakesProvider = ({ children }) => {
       lpPoolStakeFilter = readSinglePoolContract.filters.Staked(address);
       singlePoolUnstakeFilter = readSinglePoolContract.filters.Unstake(address);
       lpPoolUnstakeFilter = readSinglePoolContract.filters.Unstake(address);
+
       // load all staking/unstaking events
       loadStakingEvents();
       // subscribe to upcoming events
@@ -97,19 +98,23 @@ export const StakesProvider = ({ children }) => {
     startBlockNumber
   ) => {
     if (event.blockNumber <= startBlockNumber) return;
-    const newStake = {
+    const newStake = getStakeObject(
       account,
-      stakeId: stakeId.toString(),
-      value: ethers.utils.formatEther(value.toString()),
-      stakeTime: new Date(stakeTime.toString() * 1000),
-      lockedUntil: new Date(lockedUntil.toString() * 1000),
+      stakeId.toString(),
+      ethers.utils.formatEther(value.toString()),
+      new Date(stakeTime.toString() * 1000),
+      new Date(lockedUntil.toString() * 1000),
       pool,
-      id: stakeId + "-" + pool,
-      weight: stakeWeight.toString(),
-    };
+      stakeId + "-" + pool,
+      stakeWeight.toString()
+    );
     let stakeList = [...stakesRef.current, newStake];
     stakeList.sort((a, b) => a.lockedUntil - b.lockedUntil);
     setStakes(stakeList);
+  };
+
+  const getStakeObject = (account, stakeId, value, stakeTime, lockedUntil, pool, id, weight) => {
+    return { account, stakeId, value, stakeTime, lockedUntil, pool, id, weight };
   };
 
   // remove the Stake with id=stakeId from the list
@@ -156,16 +161,17 @@ export const StakesProvider = ({ children }) => {
     let stakeList = [];
     // add all the single pool stakes to the list
     singlePoolStakeEvents.map((event) => {
-      stakeList.push({
-        account: event.args.account,
-        stakeId: event.args.stakeId.toString(),
-        value: ethers.utils.formatEther(event.args.value.toString()),
-        stakeTime: new Date(event.args.stakeTime.toString() * 1000),
-        lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
-        pool: "Single",
-        id: event.args.stakeId.toString() + "-Single",
-        weight: event.args.stakeWeight.toString(),
-      });
+      const stakeObject = getStakeObject(
+        event.args.account,
+        event.args.stakeId.toString(),
+        ethers.utils.formatEther(event.args.value.toString()),
+        new Date(event.args.stakeTime.toString() * 1000),
+        new Date(event.args.lockedUntil.toString() * 1000),
+        "Single",
+        event.args.stakeId.toString() + "-Single",
+        event.args.stakeWeight.toString()
+      );
+      stakeList.push(stakeObject);
     });
     // remove the single pool unstakes from the list
     singlePoolUnstakeEvents.map((event) => {
@@ -174,16 +180,17 @@ export const StakesProvider = ({ children }) => {
     });
     // add all the lp pool stakes to the list
     lpPoolStakeEvents.map((event) => {
-      stakeList.push({
-        account: event.args.account,
-        stakeId: event.args.stakeId.toString(),
-        value: ethers.utils.formatEther(event.args.value.toString()),
-        stakeTime: new Date(event.args.stakeTime.toString() * 1000),
-        lockedUntil: new Date(event.args.lockedUntil.toString() * 1000),
-        pool: "LP",
-        id: event.args.stakeId.toString() + "-LP",
-        weight: event.args.stakeWeight.toString(),
-      });
+      const stakeObject = getStakeObject(
+        event.args.account,
+        event.args.stakeId.toString(),
+        ethers.utils.formatEther(event.args.value.toString()),
+        new Date(event.args.stakeTime.toString() * 1000),
+        new Date(event.args.lockedUntil.toString() * 1000),
+        "LP",
+        event.args.stakeId.toString() + "-LP",
+        event.args.stakeWeight.toString()
+      );
+      stakeList.push(stakeObject);
     });
     // remove the single pool unstakes from the list
     lpPoolUnstakeEvents.map((event) => {

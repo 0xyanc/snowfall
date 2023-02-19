@@ -9,8 +9,7 @@ import rewardsData from "../../util/rewards.json";
 
 const Dashboard = () => {
   const { address, isConnected } = useAccount();
-  const { readSinglePoolContract, writeSinglePoolContract, readLpPoolContract, writeLpPoolContract, provider } =
-    useContractProvider();
+  const { readSinglePoolContract, readLpPoolContract, provider } = useContractProvider();
 
   const [singlePendingRewards, setSinglePendingRewards] = useState(0);
   const [lpPendingRewards, setLpPendingRewards] = useState(0);

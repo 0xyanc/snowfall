@@ -55,7 +55,11 @@ module.exports = {
     deployer: {
       default: 0,
       1: 0,
-    }
+    },
+    staker: {
+      default: 1,
+      1: 1,
+    },
   },
   gasReporter: {
     enabled: true

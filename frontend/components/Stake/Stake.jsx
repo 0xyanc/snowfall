@@ -141,6 +141,16 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
 
   const stake = async () => {
     try {
+      if (!amountToStake) {
+        toast({
+          title: "Please input an amount to stake",
+          // description: "You have successfully staked your tokens",
+          status: "warning",
+          duration: 1000,
+          isClosable: true,
+        });
+        return;
+      }
       setWaitTransaction(true);
       let contract;
       if (pool === "SNOW") {
@@ -159,6 +169,7 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
       await tx.wait();
       updateInfo();
       calculateApr(lockValue);
+      setAmountToStake("");
       toast({
         title: "Staked tokens",
         description: "You have successfully staked your tokens",
@@ -177,7 +188,6 @@ const Stake = ({ pool, allowance, setSnowAllowance, setLpTokenAllowance }) => {
       });
     } finally {
       setWaitTransaction(false);
-      setAmountToStake("");
     }
   };
 

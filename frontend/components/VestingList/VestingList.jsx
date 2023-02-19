@@ -12,8 +12,6 @@ const VestingList = () => {
     var timer = setInterval(() => setDate(new Date()), 15000);
     return () => clearInterval(timer);
   });
-  const [isSingleChecked, setIsSingleChecked] = useState(false);
-  const [isLpChecked, setIsLpChecked] = useState(false);
   return (
     <>
       <Flex direction="column" w="100%">
@@ -25,7 +23,7 @@ const VestingList = () => {
           </Text>
         </Flex>
         {isConnected ? (
-          <Flex direction="column" alignItems="center" alignContent="center">
+          <Flex direction="column" alignItems="center" alignContent="center" mt="1rem">
             <TableContainer mt="1rem">
               <Table variant="striped" colorScheme="teal">
                 <Thead>

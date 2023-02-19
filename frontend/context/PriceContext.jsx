@@ -54,12 +54,10 @@ export const PriceProvider = ({ children }) => {
 
   const getSnowEthPrice = async () => {
     // approximation of the price from UniswapV2Router where all the liquidity is
-    const SNOW_ADDRESS = process.env.NEXT_PUBLIC_SNOW_ERC20;
-    const WETH_ADDRESS = process.env.NEXT_PUBLIC_WETH_ERC20;
     // check how much SNOW we get from 1 ETH
     let amountEthFromContract = await uniswapV2RouterContract.getAmountsOut(
       1, // 1 ETH
-      [WETH_ADDRESS, SNOW_ADDRESS]
+      [process.env.NEXT_PUBLIC_WETH_ERC20, process.env.NEXT_PUBLIC_SNOW_ERC20]
     );
 
     // add the 0.3% fee back
