@@ -293,13 +293,14 @@ abstract contract CorePool is Ownable {
         if (_staker == address(0)) {
             revert CorePool__InvalidStakerAddress();
         }
-        // no one has staked yet
-        if (totalPoolWeightedShares == 0) {
-            return 0;
-        }
 
         // based on the rewards per weight value, calculate pending rewards;
         User storage user = users[_staker];
+
+        // no one has staked yet or everyone has unstaked
+        if (totalPoolWeightedShares == 0) {
+            return user.pendingYield;
+        }
 
         // make sure the values are up to date in order to calculate pending rewards
         uint256 secondsPassed = block.timestamp > endTime
