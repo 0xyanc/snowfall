@@ -48,7 +48,7 @@ export const PriceProvider = ({ children }) => {
 
   const getEthUsdPrice = async () => {
     const roundData = await ethUsdPriceFeedContract.latestRoundData();
-    const ethUsdPrice = ethers.utils.formatEther(roundData.answer);
+    const ethUsdPrice = ethers.utils.formatUnits(roundData.answer, 8);
     setEthUsdPrice(ethUsdPrice);
   };
 

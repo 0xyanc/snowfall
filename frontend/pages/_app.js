@@ -6,8 +6,8 @@ import {
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { hardhat } from 'wagmi/chains';
-// import { alchemyProvider } from 'wagmi/providers/alchemy';
+import { goerli } from 'wagmi/chains';
+import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider } from '@chakra-ui/react';
 import Layout from '@/components/Layout/Layout';
@@ -15,9 +15,9 @@ import { ContractProvider } from '@/context/ContractContext';
 import { StakesProvider } from '@/context/StakesContext';
 import { PriceProvider } from '@/context/PriceContext';
 const { chains, provider } = configureChains(
-  [hardhat],
+  [goerli],
   [
-    // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
+    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_ID }),
     publicProvider()
   ]
 );
