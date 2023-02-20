@@ -113,8 +113,8 @@ const Dashboard = () => {
 
         {isConnected ? (
           <>
-            <Flex direction="column">
-              <Flex p="1rem">
+            <Flex direction="column" alignItems="center" w="60%">
+              <Flex p="1rem" justifyContent="center">
                 <PendingReward pool="Single" pendingRewards={singlePendingRewards} />
                 <PendingReward pool="LP" pendingRewards={lpPendingRewards} />
               </Flex>
