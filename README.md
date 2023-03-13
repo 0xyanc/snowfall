@@ -1,5 +1,7 @@
 # Snowfall Staking DApp
 
+This is a staking DApp developed for Alyra blockchain school final project and received a 10/10 grade.
+
 ## Link to the DApp
 
 https://snowfall-staking.vercel.app/
